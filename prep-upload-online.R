@@ -14,7 +14,11 @@ online_colnames <- online_colnames[!grepl("kont_", online_colnames)]
 
 i_start <- which(colnames(df_paper) == "e01")
 paper_colnames <- colnames(df_paper[i_start:ncol(df_paper)])
-  
+paper_colnames <- paper_colnames[!grepl("lcis_jine", paper_colnames)]
+
+paper_rename_cols <- data.frame(orig = paper_colnames, 
+                                new = online_colnames)
+
 ## Deals with sensitive information ----
 df_sensitive <- df_online %>%
   select(session, all_of(SENSITIVE_COLS))
@@ -31,12 +35,13 @@ df_online <- df_online %>%
   mutate(occup_stable = grepl("1", zamest),
          occup_freelance = grepl("2", zamest),
          occup_unemployed = grepl("3", zamest),
-         occup_socialwellfare = grepl("4", zamest))
+         occup_socialwelfare = grepl("4", zamest))
 
-paper_rename_cols <- data.frame(
-  orig = c("occup01a", "occup01b", "occup01c", "occup01d"),
-  new = c("occup_stable", "occup_freelance", "occup_unemployed", "occup_socialwellfare")
-)
+paper_rename_cols <- rbind(paper_rename_cols, 
+  c("occup01a", "occup_stable"),
+  c("occup01b", "occup_freelance"), 
+  c("occup01c", "occup_unemployed"),
+  c("occup01d", "occup_socialwelfare"))
 
 ## Relig -----
 paper_rename_cols <- rbind(rename_cols,
@@ -45,10 +50,6 @@ paper_rename_cols <- rbind(rename_cols,
       c("relig03", "vira_zal"))
 
 ## family ----
-df_online %>%
-  select(rodina) %>%
-  View()
-
 df_online <- df_online %>%
   mutate(family_single = grepl("1", rodina),
          family_relationship = grepl("2", rodina),
