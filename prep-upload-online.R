@@ -40,6 +40,12 @@ paper_colnames <- colnames(df_paper[i_start:ncol(df_paper)])
 paper_colnames <- paper_colnames[!grepl("lcis_jine", paper_colnames)]
 
 paper_rename_cols <- data.frame(orig = paper_colnames, new = online_colnames)
+## ID -----
+paper_rename_cols <- rbind(paper_rename_cols,
+    c("ident", "id"),
+    c("age1", "vek"),
+    c("edu01", "vzdel"),
+    c("edu02", "vzdel_roky"))
 
 ## Recoding povolani ------
 df_online <- df_online %>%
@@ -94,10 +100,6 @@ paper_rename_cols <- rbind(paper_rename_cols,
     c("kids01", "deti"),
     c("kids02", "deti_poc"))
 
-## ID -----
-paper_rename_cols <- rbind(paper_rename_cols,
-    c("id", "ident"))
-
 ## Renaming of paper data -----
 renaming_func <- function(cols){
   out <- sapply(cols, function(x){
@@ -120,8 +122,9 @@ df_paper <- df_paper %>%
          partner_vek = as.character(partner_vek),
          partner_vzd = as.double(partner_vzd),
          byd_pok = as.character(byd_pok),
-         kids02a = as.double(as.character(kids02a)),
-         deti_poc = as.numeric(as.character(deti_poc))) %>%
+         deti_poc = as.numeric(as.character(deti_poc)),
+         deti_vek = paste0(kids02a, kids02b, kids02c, kids02d, collapse = ",")) %>%
+  select(-matches("kids02[abcd]")) %>%
   mutate_at(vars(matches("da\\d")), ~as.double(as.character(.))) %>%
   mutate_at(vars(starts_with("lcis")), ~as.double(as.character(.)))
 
