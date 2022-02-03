@@ -5,6 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(SmartEDA)
 knitr::opts_chunk$set(echo = TRUE)
 withr::with_dir("../", {
   source("functions.R")
@@ -13,6 +14,7 @@ withr::with_dir("../", {
 
 ```{r loading}
 df_all <- read.table("../processed/all-data.csv", sep=";", head = TRUE)
+source("../process_all.R")
 ```
 
 ```{r cleaning up}
@@ -20,12 +22,76 @@ df_all <- df_all %>%
   filter(source == "paper" | !is.na(ended))
 ```
 
+```{r general overview}
+bar_plot_function <- function(data, colname){
+  ggplot(data = data, aes_string(x=colname)) +
+    geom_bar()
+}
+columns <- c("vek", "pohl", "vzdel", "vzdel_roky")
+for(colname in columns){
+  print(bar_plot_function(df_all, colname))
+}
+```
+```{r family}
+
+```
+
 ```{r occupations}
 df_all %>%
-  select(source, starts_with("occup_")) %>%
-  pivot_longer(-source) %>%
+  select(ident, source, starts_with("occup_")) %>%
+  pivot_longer(-c(source, ident)) %>%
   filter(value == 1) %>%
   ggplot(aes(name)) +
-    geom_bar(stat="count") +
-    facet_wrap(~source)
+    geom_bar(aes(y=..prop.., group=1)) +
+    facet_wrap(~source) + coord_flip()
+```
+```{r}
+barplot_out <- function(data, labeler_width = 40){
+  plt <- data %>%
+    pivot_longer(cols=everything()) %>%
+    mutate(name = get_question(name)) %>%
+    ggplot(aes(value, group=name)) +
+      geom_bar() +
+      facet_wrap(~name, labeller = label_wrap_gen(width=labeler_width))
+  print(plt)
+}
+```
+
+```{r finances}
+df_all %>%
+  select(matches("^e\\d+")) %>%
+  barplot_out()
+```
+
+```{r health}
+df_all %>%
+  select(matches("^z\\d+$")) %>%
+  barplot_out()
+```
+
+```{r partner}
+df_all %>%
+  select(matches("^p\\d+"),
+         matches("^m\\d+")) %>%
+  barplot_out(30)
+```
+
+```{r rodina}
+df_all %>%
+  select(matches("^f\\d+$")) %>%
+  barplot_out()
+```
+
+
+```{r friends}
+df_all %>%
+  select(matches("^fs\\d+$")) %>%
+  barplot_out()
+```
+
+```{r work, fig.width=10, fig.height=7}
+df_all %>%
+  select(matches("^w\\d+"),
+         matches("^cs\\d+")) %>%
+  barplot_out(30)
 ```
