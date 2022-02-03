@@ -1,0 +1,31 @@
+---
+title: "overview"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+withr::with_dir("../", {
+  source("functions.R")
+})
+```
+
+```{r loading}
+df_all <- read.table("../processed/all-data.csv", sep=";", head = TRUE)
+```
+
+```{r cleaning up}
+df_all <- df_all %>%
+  filter(source == "paper" | !is.na(ended))
+```
+
+```{r occupations}
+df_all %>%
+  select(source, starts_with("occup_")) %>%
+  pivot_longer(-source) %>%
+  filter(value == 1) %>%
+  ggplot(aes(name)) +
+    geom_bar(stat="count") +
+    facet_wrap(~source)
+```

@@ -3,9 +3,32 @@ library(googlesheets4)
 source("const.R")
 
 df_online <- read_csv("data/MIDLIFE.csv")
+
+## Deals with sensitive information ----
 SENSITIVE_COLS <- c("naroz", "kont_jmeno", "kont_tel", "kont_mail", "kont_adr")
+df_sensitive <- df_online %>%
+  select(session, all_of(SENSITIVE_COLS))
+df_online <- df_online %>%
+  select(-all_of(SENSITIVE_COLS))
+
+df_online_rekrutace <- read_csv("data/REKR_MIDLIFE.csv")
+
+df_online <- df_online %>%
+  left_join(select(df_online_rekrutace, session, ident), by = "session") %>%
+  select(ident, everything())
+
+TEMP_SHEET_NAME <- "online-original-temp"
+write_sheet(df_online, ss = GS_SHEET, sheet = TEMP_SHEET_NAME)
+
+## This 
+df_online <- df_online %>%
+  filter(povol != "thank the formr monkey")
+
+df_online <- readr::type_convert(df_online)
 
 ## Gets column names to be renamed
+source("paper.R")
+
 # NEEDS to happen first, as we are modyfying the order of the columns later on
 i_start <- which(colnames(df_online) == "e1")
 online_colnames <- colnames(df_online[i_start:ncol(df_online)])
@@ -16,19 +39,7 @@ i_start <- which(colnames(df_paper) == "e01")
 paper_colnames <- colnames(df_paper[i_start:ncol(df_paper)])
 paper_colnames <- paper_colnames[!grepl("lcis_jine", paper_colnames)]
 
-paper_rename_cols <- data.frame(orig = paper_colnames, 
-                                new = online_colnames)
-
-## Deals with sensitive information ----
-df_sensitive <- df_online %>%
-  select(session, all_of(SENSITIVE_COLS))
-df_online <- df_online %>%
-  select(-all_of(SENSITIVE_COLS))
-
-df_online_rekrutace <- read_csv("data/REKR_MIDLIFE.csv")
-
-df_online <- df_online %>%
-  left_join(select(df_online_rekrutace, session, ident), by = "session")
+paper_rename_cols <- data.frame(orig = paper_colnames, new = online_colnames)
 
 ## Recoding povolani ------
 df_online <- df_online %>%
@@ -44,7 +55,7 @@ paper_rename_cols <- rbind(paper_rename_cols,
   c("occup01d", "occup_socialwelfare"))
 
 ## Relig -----
-paper_rename_cols <- rbind(rename_cols,
+paper_rename_cols <- rbind(paper_rename_cols,
       c("relig01", "vira"),
       c("relig02", "cira_vyz"),
       c("relig03", "vira_zal"))
@@ -83,43 +94,42 @@ paper_rename_cols <- rbind(paper_rename_cols,
     c("kids01", "deti"),
     c("kids02", "deti_poc"))
 
+## ID -----
+paper_rename_cols <- rbind(paper_rename_cols,
+    c("id", "ident"))
 
 ## Renaming of paper data -----
-
-df_paper %>%
-  rename_with(function(x){
+renaming_func <- function(cols){
+  out <- sapply(cols, function(x){
     if(x %in% paper_rename_cols$orig){
       return(paper_rename_cols$new[paper_rename_cols$orig == x])
     }
     return(x)
   })
+  return(out)
+}
 
-colnames(df_online)[1:40]
-colnames(df_paper)[1:40]
-df_paper_names <- df_paper %>%
-  select(
-         -starts_with("kids"),
-         -c(1, 3:9),
-         -contains("lcis_jine"))
-head(colnames(df_paper_names), 20)
+df_paper <- df_paper %>%
+  rename_with(renaming_func)
 
-df_online_names <- df_online %>%
-  select(-c(1:5), 
-         -starts_with("vira"),
-         -starts_with("deti")) %>%
-  select(ident, ## shifts ident tot he first positions
-         everything()) %>%
-  select(-ends_with("_cont"))
-head(colnames(df_online_names), 20)
+## paper preprocessing -----
+df_paper <- df_paper %>%
+  mutate(mar_len = as.character(mar_len),
+         div_len = as.character(div_len),
+         wid_len = as.character(wid_len),
+         partner_vek = as.character(partner_vek),
+         partner_vzd = as.double(partner_vzd),
+         byd_pok = as.character(byd_pok),
+         kids02a = as.double(as.character(kids02a)),
+         deti_poc = as.numeric(as.character(deti_poc))) %>%
+  mutate_at(vars(matches("da\\d")), ~as.double(as.character(.))) %>%
+  mutate_at(vars(starts_with("lcis")), ~as.double(as.character(.)))
 
-df_names <- data.frame(online_names = colnames(df_online_names),
-                       paper_names = colnames(df_paper_names))
-View(df_names)
-write_sheet(df_names, ss=GS_SHEET, sheet = "nazvy-sloupcu")
-## -------
+df_online <- df_online %>%
+  mutate(byd_osob = as.double(byd_osob)) %>%
+  mutate_at(vars(matches("da\\d")), ~as.double(as.character(.))) %>%
+  mutate_at(vars(starts_with("lcis")), ~as.double(.))
 
-
-TEMP_SHEET_NAME <- "online-original-temp"
-
-write_sheet(df_online, ss = GS_SHEET, sheet = TEMP_SHEET_NAME)
-
+df_all <- bind_rows(df_online, df_paper)
+df_all$source <- ifelse(is.na(df_all$created), "paper", "online")
+write.table(df_all, "processed/all-data.csv", sep=";", row.names = FALSE)
