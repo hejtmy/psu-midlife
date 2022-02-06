@@ -41,3 +41,8 @@ df_data$created[1:10]
 ggplot(df_data, aes(vek, fill=pohl)) + 
   geom_histogram() +
   facet_wrap(~pohl)
+
+
+## Uploads variables online
+df_variables <- data.frame(variable = colnames(df_all))
+write_sheet(df_variables, ss = GS_SHEET, sheet = "Question-categories")
