@@ -1,5 +1,3 @@
-
-
 ## Basic pipeline
 Data are saved in google sheets and fetched wiht the get-online-data.R script
 

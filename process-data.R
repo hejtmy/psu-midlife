@@ -115,4 +115,6 @@ df_online <- df_online %>%
 
 df_all <- bind_rows(df_online, df_paper)
 df_all$source <- ifelse(is.na(df_all$created), "paper", "online")
+dir.create("processed", showWarnings = FALSE)
 write.table(df_all, "processed/all-data.csv", sep=";", row.names = FALSE)
+rm(df_paper, df_online, paper_rename_cols, i_start, online_colnames, paper_colnames)
