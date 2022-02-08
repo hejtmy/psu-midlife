@@ -1,6 +1,8 @@
 data/*
 processed/*
 
+*playground.R
+
 # History files
 .Rhistory
 .Rapp.history
