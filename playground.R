@@ -1,6 +1,7 @@
 library(lubridate)
 library(tidyverse)
-df_data <- readxl::read_xlsx("data/Copy of MIDLIFE 221121-notencrypted.xlsx", sheet="Sparovano")
+df_data <- readxl::read_xlsx("data/Copy of MIDLIFE 221121-notencrypted.xlsx", 
+                             sheet="Sparovano")
 str(df_data)
 
 df_data$vek[is.na(as.numeric(df_data$vek))]
@@ -34,7 +35,6 @@ df_data %>%
 table(is.na(df_data$ended))
 
 ## 
-
 df_data$created[1:10]
 
 ## 
