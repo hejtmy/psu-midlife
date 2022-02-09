@@ -1,10 +1,10 @@
 library(shiny)
 library(tidyverse)
-source("components/sidebar.R")
-source("functions/question-categories.R")
-source("../functions/questions.R")
+source("app/components/sidebar.R")
+source("functions/questions.R")
 
-df_all <- read.table("../processed/all-data.csv", sep=";", header=TRUE)
+df_question_categories <- read.table("processed/question-categories.csv", sep=";", header=TRUE)
+df_all <- read.table("processed/all-data.csv", sep=";", header=TRUE)
 
 ui <- shinyUI(fluidPage(
   navbarPage(
@@ -20,7 +20,9 @@ ui <- shinyUI(fluidPage(
                 sidebarLayout(
                   appSidebarPanel(df_question_categories),
                   mainPanel(
-                    uiOutput('univariate_plots')))
+                    uiOutput('univariate_plots'),
+                    width = 10
+                    ))
              )))
   )
 ))
@@ -40,11 +42,11 @@ server <- function(input, output,session) {
   observeEvent(rv$data_filtered, {
     uniPlot <- lapply(names(rv$data_filtered), function(col_i){
       ggplot(rv$data_filtered, aes_string(x=col_i)) + 
-        geom_bar(fill = "#8cd3ff") +
+        geom_bar(aes(y=..prop..)) +
         theme_classic() +
-        labs(title = col_i) +
-        xlab(col_i) +
-        ylab("Count")
+        scale_y_continuous(labels = scales::label_percent()) +
+        labs(title = str_wrap(get_question(col_i), 60)) +
+        ylab("Proportion")
     })
     
     output$univariate_plots <- renderUI({

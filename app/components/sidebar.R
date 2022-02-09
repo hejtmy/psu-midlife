@@ -5,7 +5,8 @@ appSidebarPanel <- function(df_question_categories){
   names(choices) <- options
   out <- sidebarPanel(
     selectInput("question_category", "Select question category", 
-                choices)
+                choices),
+    width = 2
   )
   return(out)
 }
