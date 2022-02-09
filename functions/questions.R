@@ -17,5 +17,3 @@ get_question <- function(question_code){
 load_questions <- function(){
   QUESTIONS <<- jsonlite::fromJSON(file("data/MIDLIFE.json"))
 }
-
-load_questions()

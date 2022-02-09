@@ -14,3 +14,5 @@ df_all %>%
 df_all %>% 
   ggplot(aes(swls_satifaction)) + geom_histogram()
 
+## LCIS
+
