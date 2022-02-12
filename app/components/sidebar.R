@@ -1,4 +1,4 @@
-appSidebarPanel <- function(df_question_categories){
+appSidebarPanel <- function(df_question_categories, split_vars){
   options <- unique(df_question_categories$category)
   options <- options[!is.na(options)]
   choices <- as.list(options)
@@ -6,6 +6,8 @@ appSidebarPanel <- function(df_question_categories){
   out <- sidebarPanel(
     selectInput("question_category", "Select question category", 
                 choices),
+    selectInput("split_variable", "Select split variable", 
+            c("none", split_vars)),
     width = 2
   )
   return(out)

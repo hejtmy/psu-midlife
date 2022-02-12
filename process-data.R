@@ -1,10 +1,10 @@
 library(tidyverse)
-source("get-online-data.R")
 
 ## Recodes online varialbes -----
 df_online <- df_online %>%
   filter(povol != "thank the formr monkey")
 # Conversts data types after error rows are removed
+
 df_online <- readr::type_convert(df_online)
 
 ## Creates renaming cols -------
@@ -115,6 +115,5 @@ df_online <- df_online %>%
 
 df_all <- bind_rows(df_online, df_paper)
 df_all$source <- ifelse(is.na(df_all$created), "paper", "online")
-dir.create("processed", showWarnings = FALSE)
-write.table(df_all, "processed/all-data.csv", sep=";", row.names = FALSE)
+
 rm(df_paper, df_online, paper_rename_cols, i_start, online_colnames, paper_colnames)
