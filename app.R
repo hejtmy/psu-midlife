@@ -5,7 +5,7 @@ source("functions/questions.R")
 source("process-all.R")
 
 df_question_categories <- read.table("processed/question-categories.csv", sep=";", header=TRUE)
-df_all <- read.table("processed/all-data.csv", sep=";", header=TRUE)
+df_all <- read.table("processed/all-data-raw.csv", sep=";", header=TRUE)
 df_all <- process_data(df_all)
 
 df_all <- df_all %>%
