@@ -1,6 +1,12 @@
+#' This expects the FORMR midlife data to be downloaded and placed in data folder
+#' IT processes and uploads the data online.
+#' 
+#' this script was run only a single time,
+#' all the consecutive analyses are done on the online data
+
+
 library(tidyverse)
-library(googlesheets4)
-source("const.R")
+source("functions/fetch-online-data.R")
 
 df_online <- read_csv("data/MIDLIFE.csv")
 
