@@ -15,3 +15,16 @@ fetch_question_categories <- function(){
   df <- read_sheet(GS_SHEET, sheet = "Question-categories")
   return(df)
 }
+
+#' Updates the list 
+#'
+#' @param df_all table with all the columns
+update_question_categories <- function(df_all){
+  df_categories <- fetch_question_categories()
+  existing_questions <- df_categories[[1]]
+  new_questions <- setdiff(colnames(df_all), existing_questions)
+  df_new_questions <- data.frame(matrix(ncol = ncol(df_categories), nrow = length(new_questions)))
+  colnames(df_new_questions) <- colnames(df_categories)
+  df_new_questions[,1] <- new_questions
+  sheet_append(GS_SHEET, df_new_questions, sheet = "Question-categories")
+}
