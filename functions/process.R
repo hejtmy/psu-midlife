@@ -1,4 +1,6 @@
 process_data <- function(df_all){
+  # should be run first before any calculations are readded
+  df_all <- remove_duplicit_online_participants(df_all)
   df_all <- df_all %>%
     process_demographics() %>%
     process_swls() %>%
@@ -44,3 +46,23 @@ process_swls <- function(df_all){
 }
 
 ## LCIS
+
+## Work scale ----
+# reverzní skórování položek cs01; cs03; cs04; cs05; cs11; cs12; cs13; cs14; cs15; cs16
+process_work_scale <- function(df_all){
+  df_all <- df_all %>% 
+    mutate(cs_s_score = reversed(cs1, 6) + cs2 + reversed(cs3,6) + 
+             reversed(cs4, 6) + reversed(cs5, 6) + cs6 + cs7 + cs8 + cs9 + cs10 + 
+             reversed(cs11, 6) + reversed(cs12, 6) + reversed(cs13, 6) + 
+             reversed(cs14, 6) + reversed(cs15, 6) + reversed(cs16, 6))
+  return(df_all)
+}
+
+remove_duplicit_online_participants <- function(df_all){
+  DUPLICIT_PARTICIPANTS <- toupper(c("janciz1362", "petkri1070", "markal1678",
+                                     "gabtyr0673", "marhro0870", "gabkli3166",
+                                     "petwal0769"))
+  df_all <- filter(df_all, source == "paper" | 
+                     !(toupper(ident) %in% DUPLICIT_PARTICIPANTS))
+  return(df_all)
+}

@@ -20,35 +20,17 @@ df_data <- df_data %>%
          
 summary(df_data$filling_duration_hours)
 
-
-df_data %>%
-  filter(filling_duration_hours < 48) %>%
-  ggplot(aes(filling_duration_hours)) + geom_histogram()
-
-df_data %>%
-  filter(filling_duration_hours < 48) %>%
-  mutate(month_year_finished = format_ISO8601(ended, precision = "ym")) %>%
-  group_by(month_year_finished) %>%
-  count()
-
-## 
-table(is.na(df_data$ended))
-
-## 
-df_data$created[1:10]
-
-## 
-ggplot(df_data, aes(vek, fill=pohl)) + 
-  geom_histogram() +
-  facet_wrap(~pohl)
-
-
 ## Uploads variables online
 df_variables <- data.frame(variable = colnames(df_all))
 write_sheet(df_variables, ss = GS_SHEET, sheet = "Question-categories")
 
 
-# 
+# Quesitons getting ------
 get_question(colnames(df_all)[grepl("panas", colnames(df_all))])
 
-                              
+## Processing process ----
+colnames(df_all)
+
+df_all %>%
+  mutate(cs_s_score = reversed(cs1, 6) + cs2 + reversed(cs3,6) + reversed(cs4, 6)) %>%
+  select(starts_with("cs"))
