@@ -3,6 +3,7 @@ library(tidyverse)
 ## Recodes online varialbes -----
 df_online <- df_online %>%
   filter(povol != "thank the formr monkey")
+
 # Conversts data types after error rows are removed
 
 df_online <- readr::type_convert(df_online)
