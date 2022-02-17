@@ -21,7 +21,9 @@ paper_colnames <- colnames(df_paper[i_start:ncol(df_paper)])
 paper_colnames <- paper_colnames[!grepl("lcis_jine", paper_colnames)]
 
 paper_rename_cols <- data.frame(orig = paper_colnames, new = online_colnames)
-## ID -----
+
+
+## ID ----- 
 paper_rename_cols <- rbind(paper_rename_cols,
     c("id", "ident"),
     c("age1", "vek"),
@@ -47,7 +49,7 @@ paper_rename_cols <- rbind(paper_rename_cols,
       c("relig02", "cira_vyz"),
       c("relig03", "vira_zal"))
 
-## family ----
+## family and partner ----
 df_online <- df_online %>%
   mutate(family_single = grepl("1", rodina),
          family_relationship = grepl("2", rodina),
@@ -70,7 +72,7 @@ paper_rename_cols <- rbind(paper_rename_cols,
     c("partner02", "partner_pov"),
     c("partner03", "partner_vzd"))
 
-## bydlení ---
+## bydlení ----
 paper_rename_cols <- rbind(paper_rename_cols,
     c("home01", "byd_pok"),
     c("home02", "byd_vlast"),
@@ -94,6 +96,7 @@ renaming_func <- function(cols){
 
 df_paper <- df_paper %>%
   rename_with(renaming_func)
+
 
 ## paper preprocessing -----
 df_paper <- df_paper %>%

@@ -46,3 +46,9 @@ ggplot(df_data, aes(vek, fill=pohl)) +
 ## Uploads variables online
 df_variables <- data.frame(variable = colnames(df_all))
 write_sheet(df_variables, ss = GS_SHEET, sheet = "Question-categories")
+
+
+# 
+get_question(colnames(df_all)[grepl("panas", colnames(df_all))])
+
+                              
