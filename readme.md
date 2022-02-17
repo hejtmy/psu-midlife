@@ -12,7 +12,7 @@ The entire procedure (data loading, processing and saving) can be found in `scri
 In case you do not want to mess with the pipeline, you can simply source it to get your project ready.
 
 ```r
-source("buffer-data.R")
+source("scripts/buffer-data.R")
 ```
 
 This will create `df_all` and `df_question_categories` dataframes, make a folder `processed`
