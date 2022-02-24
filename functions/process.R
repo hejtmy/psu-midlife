@@ -1,7 +1,9 @@
+library(tidyverse)
 process_data <- function(df_all){
   # should be run first before any calculations are readded
   df_all <- remove_duplicit_online_participants(df_all)
   df_all <- df_all %>%
+    add_missing_values() %>% 
     process_demographics() %>%
     process_swls() %>%
     process_panas()
@@ -58,11 +60,25 @@ process_work_scale <- function(df_all){
   return(df_all)
 }
 
-remove_duplicit_online_participants <- function(df_all){
+remove_duplicit_online_participants <- function(df){
   DUPLICIT_PARTICIPANTS <- toupper(c("janciz1362", "petkri1070", "markal1678",
                                      "gabtyr0673", "marhro0870", "gabkli3166",
                                      "petwal0769"))
-  df_all <- filter(df_all, source == "paper" | 
-                     !(toupper(ident) %in% DUPLICIT_PARTICIPANTS))
+  df <- filter(df, source == "paper" | 
+                  !(toupper(ident) %in% DUPLICIT_PARTICIPANTS))
+  return(df)
+}
+
+add_missing_values <- function(df_all){
+  longest_missing <- function(row){
+    res <- rle(as.logical(is.na(row)))
+    out <- max(res$lengths[res$values == 1])
+    return(out)
+  }
+  df_all <- df_all %>%
+    rowwise() %>%
+    mutate(n_missing = sum(as.logical(cur_data())),
+           longest_missing = longest_missing(cur_data()))
   return(df_all)
 }
+
