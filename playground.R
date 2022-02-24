@@ -26,7 +26,7 @@ write_sheet(df_variables, ss = GS_SHEET, sheet = "Question-categories")
 
 
 # Quesitons getting ------
-get_question(colnames(df_all)[grepl("panas", colnames(df_all))])
+get_question_text(colnames(df_all)[grepl("panas", colnames(df_all))])
 
 ## Processing process ----
 colnames(df_all)

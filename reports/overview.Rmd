@@ -45,6 +45,7 @@ df_all %>%
     geom_bar(aes(y=..prop.., group=1)) +
     facet_wrap(~source) + coord_flip()
 ```
+
 ```{r}
 barplot_out <- function(data, labeler_width = 40){
   plt <- data %>%

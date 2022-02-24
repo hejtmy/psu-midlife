@@ -1,8 +1,8 @@
 #' Title
 #'
-#' @param data 
-#' @param question_code 
-#' @param split 
+#' @param data processed data for the participants
+#' @param question_code code for the question data to plot
+#' @param split which variable to split the data on
 #'
 #' @return
 #'
@@ -14,6 +14,7 @@ plot_question_results <- function(data, question_code, splitvar = "none"){
     out <- plot_question_results_nosplit(data, question_code)
   }
   plt <- out$plot +
+    scale_x_continuous(limits = c(1, get_question_max_value(question_code))) +
     geom_bar(aes(y=..prop..), position = position_identity()) +
     scale_y_continuous(labels = scales::label_percent()) +
     theme_classic() +
