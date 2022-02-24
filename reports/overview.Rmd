@@ -49,7 +49,7 @@ df_all %>%
 barplot_out <- function(data, labeler_width = 40){
   plt <- data %>%
     pivot_longer(cols=everything()) %>%
-    mutate(name = get_question(name)) %>%
+    mutate(name = get_question_text(name)) %>%
     ggplot(aes(value, group=name)) +
       geom_bar() +
       facet_wrap(~name, labeller = label_wrap_gen(width=labeler_width))

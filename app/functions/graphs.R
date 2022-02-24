@@ -17,7 +17,7 @@ plot_question_results <- function(data, question_code, splitvar = "none"){
     geom_bar(aes(y=..prop..), position = position_identity()) +
     scale_y_continuous(labels = scales::label_percent()) +
     theme_classic() +
-    labs(title = str_wrap(get_question(question_code), 60), y = "Proportion",
+    labs(title = str_wrap(get_question_text(question_code), 60), y = "Proportion",
          x = "") +
     guides(fill = "none") +
     geom_vline(data = out$summary, aes(xintercept = value, linetype = name),
