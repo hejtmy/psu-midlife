@@ -1,7 +1,16 @@
 library(tidyverse)
-process_data <- function(df_all){
+#' processes data 
+#'
+#' @param df_all data to process
+#' @param df_error data with erroneous participants to remove
+#'
+#' @return
+#' @export
+#'
+#' @examples
+process_data <- function(df_all, df_error){
   # should be run first before any calculations are readded
-  df_all <- remove_duplicit_online_participants(df_all)
+  df_all <- remove_erroneous_recordings(df_all, df_error)
   df_all <- df_all %>%
     add_missing_values() %>% 
     process_demographics() %>%
@@ -60,13 +69,13 @@ process_work_scale <- function(df_all){
   return(df_all)
 }
 
-remove_duplicit_online_participants <- function(df){
-  DUPLICIT_PARTICIPANTS <- toupper(c("janciz1362", "petkri1070", "markal1678",
-                                     "gabtyr0673", "marhro0870", "gabkli3166",
-                                     "petwal0769"))
-  df <- filter(df, source == "paper" | 
-                  !(toupper(ident) %in% DUPLICIT_PARTICIPANTS))
-  return(df)
+remove_erroneous_recordings <- function(df_all, df_error){
+  df_error$ident <- toupper(df_error$ident)
+  df_all <- df_all %>% 
+    mutate(temp_ident = toupper(ident)) %>%
+    anti_join(df_error, by=c("temp_ident" = "ident", "source" = "source")) %>%
+    select(-temp_ident)
+  return(df_all)
 }
 
 add_missing_values <- function(df_all){

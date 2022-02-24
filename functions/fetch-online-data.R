@@ -16,6 +16,11 @@ fetch_question_categories <- function(){
   return(df)
 }
 
+fetch_error_data <- function(){
+  df <- read_sheet(GS_SHEET, sheet = "Error-data")
+  return(df)
+}
+
 #' Updates the list 
 #'
 #' @param df_all table with all the columns
