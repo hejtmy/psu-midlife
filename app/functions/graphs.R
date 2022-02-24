@@ -14,7 +14,6 @@ plot_question_results <- function(data, question_code, splitvar = "none"){
     out <- plot_question_results_nosplit(data, question_code)
   }
   plt <- out$plot +
-    scale_x_continuous(limits = c(1, get_question_max_value(question_code))) +
     geom_bar(aes(y=..prop..), position = position_identity()) +
     scale_y_continuous(labels = scales::label_percent()) +
     theme_classic() +

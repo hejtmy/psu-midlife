@@ -6,8 +6,7 @@ source("app/functions/graphs.R")
 source("functions/process.R")
 
 df_question_categories <- read.table("processed/question-categories.csv", sep=";", header=TRUE)
-df_app <- read.table("processed/all-data-raw.csv", sep=";", header=TRUE)
-df_app <- process_data(df_app)
+df_app <- load_processed()
 
 df_app <- df_app %>%
   filter(pohl != "O",
