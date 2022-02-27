@@ -14,8 +14,28 @@ process_data <- function(df_all, df_error){
   df_all <- df_all %>%
     add_missing_values() %>% 
     process_demographics() %>%
-    process_swls() %>%
-    process_panas()
+    process_work_scale() %>%
+    process_finance_scale() %>%
+    process_health_scale() %>% 
+    process_partner_scale() %>%
+    process_family_scale() %>%
+    process_friends_scale() %>%
+    process_bfi2s() %>% 
+    process_brs() %>% 
+    process_bpns() %>% 
+    process_cesd() %>%
+    process_dids() %>% 
+    process_gbc() %>% 
+    process_goals() %>% 
+    process_gse_scale() %>% 
+    process_lgs() %>% 
+    process_mlq_scale() %>% 
+    process_panas() %>%
+    process_pss() %>% 
+    process_pwb() %>% 
+    process_rheis() %>% 
+    process_swls() %>% 
+    proces_ztpis()
   return(df_all)
 }
 
