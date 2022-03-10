@@ -6,6 +6,9 @@ source("functions/fetch-online-data.R")
 df_online <- fetch_data_online()
 df_paper <- fetch_data_paper()
 
+source("scripts/merge-german-online-data.R")
+df_german <- fetch_german_data()
+
 source("scripts/merge-paper-online-data.R")
 
 dir.create("processed", showWarnings = FALSE)

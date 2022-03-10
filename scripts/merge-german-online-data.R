@@ -1,13 +1,5 @@
 # This expects the xlsx file to be present
-source("functions/fetch-online-data.R")
-df_online <- fetch_data_online()
 
-df_german <- readxl::read_excel("Midlife_ger28022022.xlsx")
-SENSITIVE_COLS <- c("kont_name", "kont_tel", "kont_mail", "kont_adr", "email_giveaway")
-
-df_german <- df_german %>%
-  select(-SENSITIVE_COLS)
-  
 df_german <- df_german %>%
   select(-c(giveaway, interview_consent, longterm_consent, charity))
 
@@ -21,4 +13,5 @@ df_german <- df_german %>%
 
 df_german <- select(df_german, -partner_widow_age)
 colnames(df_german) <- colnames(select(df_online, -ident))
-write_sheet(df_german, ss = GS_SHEET, sheet = "Original-german")
+
+bind_rows(df_german, df_online)

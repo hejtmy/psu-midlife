@@ -1,8 +1,9 @@
 library(googlesheets4)
+
 GS_SHEET <- "1pPdD8Q3r9DLZuKAfFrm95W14GHbUw6NOIipgxYJRUeI"
 
 fetch_data_paper <- function(){
-  df_paper <- read_sheet(ss = GS_SHEET, sheet = "Original-paper", na = c("na", "nr"))
+  df_paper <- read_sheet(ss = GS_SHEET,sheet = "Original-paper", na = c("na", "nr"))
   return(df_paper)
 }
 
@@ -19,6 +20,11 @@ fetch_question_categories <- function(){
 fetch_error_data <- function(){
   df <- read_sheet(GS_SHEET, sheet = "Error-data")
   return(df)
+}
+
+fetch_german_data <- function(){
+  df_german <- read_sheet(GS_SHEET, "Original-german")
+  return(df_german)
 }
 
 #' Updates the list 
