@@ -4,7 +4,6 @@
 #' this script was run only a single time,
 #' all the consecutive analyses are done on the online data
 
-
 library(tidyverse)
 source("functions/fetch-online-data.R")
 
@@ -26,3 +25,14 @@ df_online <- df_online %>%
 
 TEMP_SHEET_NAME <- "Original-online-temp"
 write_sheet(df_online, ss = GS_SHEET, sheet = TEMP_SHEET_NAME)
+
+# GERMAN DATA ----
+source("functions/fetch-online-data.R")
+
+df_german <- readxl::read_excel("Midlife_ger28022022.xlsx")
+SENSITIVE_COLS <- c("kont_name", "kont_tel", "kont_mail", "kont_adr", "email_giveaway")
+
+df_german <- df_german %>%
+  select(-SENSITIVE_COLS)
+  
+write_sheet(df_german, ss = GS_SHEET, sheet = "Original-german")
