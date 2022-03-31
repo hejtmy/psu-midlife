@@ -7,31 +7,39 @@ fetch_data_paper <- function(){
   return(df_paper)
 }
 
-fetch_data_paper_edited <- function(){
-  return(fetch_sheet("Edited-paper"))
+fetch_data_paper_edited <- function(use_buffered=TRUE){
+  return(fetch_sheet("Edited-paper", use_buffered))
 }
 
-fetch_data_online <- function(){
-  return(fetch_sheet("Original-online"))
+fetch_data_online <- function(use_buffered=TRUE){
+  return(fetch_sheet("Original-online", use_buffered))
 }
-fetch_data_online_edited <- function(){
-  return(fetch_sheet("Edited-online"))
-}
-
-fetch_question_categories <- function(){
-  return(fetch_sheet("Question-categories"))
+fetch_data_online_edited <- function(use_buffered=TRUE){
+  return(fetch_sheet("Edited-online", use_buffered))
 }
 
-fetch_error_data <- function(){
-  return(fetch_sheet("Error-data"))
+fetch_question_categories <- function(use_buffered=TRUE){
+  return(fetch_sheet("Question-categories", use_buffered))
 }
 
-fetch_german_data <- function(){
-  return(fetch_sheet("Original-german"))
+fetch_error_data <- function(use_buffered=TRUE){
+  return(fetch_sheet("Error-data", use_buffered))
 }
 
-fetch_sheet <- function(sheet_name,...){
-  sh <- read_sheet(ss=GS_SHEET, sheet=sheet_name,...)
+fetch_german_data <- function(use_buffered=TRUE){
+  return(fetch_sheet("Original-german", use_buffered, na=c("?")))
+}
+
+fetch_sheet <- function(sheet_name, use_buffered, ...){
+  filepath <- paste0(file.path("data", "buffered", sheet_name), ".csv",
+                     collapse = "")
+  if(use_buffered & file.exists(filepath)){
+    sh <- read.table(filepath, sep=";", header=TRUE)
+  } else {
+    dir.create(dirname(filepath), showWarnings = FALSE)
+    sh <- read_sheet(ss=GS_SHEET, sheet=sheet_name, ...)
+    write.table(sh, filepath, sep=";")
+  }
   return(sh)
 }
 

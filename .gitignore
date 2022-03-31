@@ -1,5 +1,5 @@
 data/*
-processed/*
+data/processed/*
 
 *playground.R
 
