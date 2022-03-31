@@ -22,7 +22,6 @@ paper_colnames <- paper_colnames[!grepl("lcis_jine", paper_colnames)]
 
 paper_rename_cols <- data.frame(orig = paper_colnames, new = online_colnames)
 
-
 ## ID ----- 
 paper_rename_cols <- rbind(paper_rename_cols,
     c("id", "ident"),
