@@ -15,10 +15,12 @@ df_german <- df_german %>%
 colnames(df_german) <- colnames(select(df_online, -ident))
 df_german <- df_german %>%
   mutate(vek=as.character(vek),
-         wid_len=as.character(wid_len)) %>%
+         wid_len=as.character(wid_len),
+         vzdel_roky = as.character(vzdel_roky)) %>%
   mutate_at(vars(starts_with("lcis")), ~as.character(.))
 
 df_online <- df_online %>%
-  mutate_at(vars(starts_with("lcis")), ~as.character(.))
+  mutate_at(vars(starts_with("lcis")), ~as.character(.)) %>%
+  mutate(vzdel_roky = as.character(vzdel_roky))
 
 df_online <- bind_rows(df_german, df_online)
