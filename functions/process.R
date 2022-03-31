@@ -29,13 +29,13 @@ process_data <- function(df_all, df_error){
     process_goals() %>% 
     process_gse_scale() %>% 
     process_lgs() %>% 
-    process_mlq_scale() %>% 
+    process_mlq() %>% 
     process_panas() %>%
     process_pss() %>% 
     process_pwb() %>% 
     process_rheis() %>% 
     process_swls() %>% 
-    proces_ztpis()
+    process_zftp()
   return(df_all)
 }
 
@@ -311,7 +311,7 @@ process_lgs <- function(df_all){
 }
 
 ##TIME PERSPECTIVE -----
-proces_zftp <- function(df_all){
+process_zftp <- function(df_all){
   df_all <- df_all %>%
     mutate(zftp_s_past_negative = zftp_02 + zftp_10 + zftp_17,
            zftp_s_past_positive = zftp_01 + zftp_03 + zftp_07,
