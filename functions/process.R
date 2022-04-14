@@ -20,6 +20,8 @@ process_data <- function(df_all, df_error){
     process_partner_scale() %>%
     process_family_scale() %>%
     process_friends_scale() %>%
+    process_lcis_kol() %>%
+    process_lcis_values() %>%
     process_bfi2s() %>% 
     process_brs() %>% 
     process_bpns() %>% 
@@ -69,6 +71,29 @@ process_panas <- function(df_all){
 }
 
 ## LCIS
+process_lcis_kol <- function(df_all){
+  LCIS_QUESTIONS <- 45
+  for(i in seq_len(LCIS_QUESTIONS)){
+    checked_yes <- df_all[[sprintf("lcis%d", i)]] == 1
+    old_value <- df_all[[sprintf("lcis%d_kol", i)]]
+    new_kol_name <- sprintf("lcis%d_s_computedkol", i)
+    df_all[[new_kol_name]] <- ifelse(checked_yes & is.na(old_value), 1, old_value)
+  }
+  return(df_all)
+}
+
+process_lcis_values <- function(df_all){
+  ## ADD MULTIPLIERS HERE
+  MULTIPLIERS <- rep(1, 45)
+  for(i in seq_len(length(MULTIPLIERS))){
+    weight_name <- sprintf("lcis%d_s_weight", i)
+    computed_weight_name <- sprintf("lcis%d_s_computedweigth", i)
+    df_all[[weight_name]] <- df_all[[sprintf("lcis%d_kol", i)]] * MULTIPLIERS[i]
+    df_all[[computed_weight_name]] <- 
+      df_all[[sprintf("lcis%d_s_computedkol", i)]] * MULTIPLIERS[i]
+  }
+  return(df_all)
+}
 
 ## Work scale ----
 # reverzní skórování položek cs01; cs03; cs04; cs05; cs11; cs12; cs13; cs14; cs15; cs16
