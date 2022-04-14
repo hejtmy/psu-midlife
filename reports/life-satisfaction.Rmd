@@ -1,0 +1,58 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = '../')
+library(tidyverse)
+library(here)
+library(psych)
+library(correlation)
+```
+
+```{r loading}
+source(here("functions/questions.R"))
+source(here("functions/process.R"))
+source(here("functions/loading.R"))
+df_question_categories <- read.table(here("data/processed/question-categories.csv"),
+                                     sep=";", header=TRUE)
+df_processed <- load_processed()
+```
+
+```{r}
+df_processed %>%
+  filter(!is.na(ident)) %>%
+  select(ident, starts_with("LS")) %>%
+  pivot_longer(-ident) %>%
+  ggplot(aes(name, value, color=ident, group=ident)) + geom_line() +
+  guides(color="none")
+```
+
+```{r}
+df_processed %>%
+  filter(!is.na(ident)) %>%
+  select(ident, starts_with("LS")) %>%
+  pivot_longer(-ident) %>%
+  ggplot(aes(name, value)) + geom_boxplot() +
+    geom_jitter(width = 0.2, alpha = 0.1)
+```
+
+```{r}
+df_processed %>%
+  filter(!is.na(ident), vzdel != "elementary") %>%
+  select(ident, vzdel, starts_with("LS")) %>%
+  pivot_longer(-c(ident, vzdel)) %>%
+  ggplot(aes(name, value, fill=vzdel, color=vzdel)) + geom_boxplot() +
+    geom_jitter(width = 0.2, alpha = 0.1)
+```
+
+```{r}
+df_processed %>%
+  filter(!is.na(ident), pohl != "O") %>%
+  select(ident, pohl, starts_with("LS")) %>%
+  pivot_longer(-c(ident, pohl)) %>%
+  ggplot(aes(name, value, fill=pohl, color=pohl)) + geom_boxplot() +
+    geom_jitter(width = 0.2, alpha = 0.1)
+```

@@ -1,0 +1,61 @@
+---
+title: "Factor analyses"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = '../')
+library(tidyverse)
+library(here)
+library(psych)
+library(correlation)
+```
+
+```{r loading}
+source(here("functions/questions.R"))
+source(here("functions/process.R"))
+source(here("functions/loading.R"))
+df_question_categories <- read.table(here("data/processed/question-categories.csv"),
+                                     sep=";", header=TRUE)
+df_processed <- load_processed()
+df_processed <- df_processed %>%
+  filter(language == "czech")
+```
+
+```{r}
+partner_items <- select(df_processed, matches("^p\\d+")) %>%
+  drop_na
+correlation(partner_items)
+KMO(partner_items)
+eigen(cor(partner_items, use = "complete.obs"))
+scree(partner_items, pc=FALSE)
+fa.parallel(partner_items, fa="fa")
+```
+
+```{R}
+fit <- factanal(partner_items[complete.cases(partner_items),], 2, rotation="promax")
+fit <- fa(partner_items, nfactors=2, rotate="varimax")
+print(fit, digits=2, cutoff=0.3, sort=TRUE)
+
+loads <- fit$loadings
+fa.diagram(loads)
+```
+
+```{r}
+work_items <- select(df_processed, matches("^cs\\d+")) %>%
+  drop_na
+correlation(work_items)
+KMO(work_items)
+eigen(cor(work_items, use = "complete.obs"))
+scree(work_items, pc=FALSE)
+fa.parallel(work_items, fa="fa")
+```
+
+```{R}
+fit <- fa(work_items, nfactors=5, rotate="varimax")
+print(fit, digits=2, cutoff=0.3, sort=TRUE)
+
+loads <- fit$loadings
+fa.diagram(loads)
+```
