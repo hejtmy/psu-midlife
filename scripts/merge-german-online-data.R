@@ -12,6 +12,7 @@ df_german <- df_german %>%
   add_column(lcis7_freq = NA, .after = "lcis7") %>% 
   add_column(lcis12_freq = NA, .after = "lcis12")
 
+
 colnames(df_german) <- colnames(select(df_online, -ident))
 df_german <- df_german %>%
   mutate(vek=as.character(vek),
@@ -23,4 +24,12 @@ df_online <- df_online %>%
   mutate_at(vars(starts_with("lcis")), ~as.character(.)) %>%
   mutate(vzdel_roky = as.character(vzdel_roky))
 
+# Language ------
+df_german <- df_german %>%
+  mutate(language = "german")
+df_online <- df_online %>%
+  mutate(language = "czech")
+
+# Final merge ---------
 df_online <- bind_rows(df_german, df_online)
+rm(df_german)

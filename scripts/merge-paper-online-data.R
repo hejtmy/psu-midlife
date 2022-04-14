@@ -1,15 +1,9 @@
 library(tidyverse)
-
-## Recodes online varialbes -----
-df_online <- df_online %>%
-  filter(povol != "thank the formr monkey")
-
-# Conversts data types after error rows are removed
-
-df_online <- readr::type_convert(df_online)
+# Language --------
+df_paper <- mutate(df_paper, language = "czech")
 
 ## Creates renaming cols -------
-# NEEDS to happen first, as we are modyfying the order of the columns later on
+# NEEDS to happen first, as we are modifying the order of the columns later on
 df_online <- select(df_online, ident, everything())
 i_start <- which(colnames(df_online) == "e1")
 online_colnames <- colnames(df_online[i_start:ncol(df_online)])
@@ -96,7 +90,6 @@ renaming_func <- function(cols){
 df_paper <- df_paper %>%
   rename_with(renaming_func)
 
-
 ## paper preprocessing -----
 df_paper <- df_paper %>%
   mutate(mar_len = as.character(mar_len),
@@ -116,7 +109,13 @@ df_online <- df_online %>%
   mutate_at(vars(matches("da\\d")), ~as.double(as.character(.))) %>%
   mutate_at(vars(starts_with("lcis")), ~as.double(.))
 
+
+
+# Source -----------
+df_paper <- mutate(df_paper, source = "paper")
+df_online <- mutate(df_online, source = "online")
+
+# Final merge -------
 df_all <- bind_rows(df_online, df_paper)
-df_all$source <- ifelse(is.na(df_all$created), "paper", "online")
 
 rm(df_paper, df_online, paper_rename_cols, i_start, online_colnames, paper_colnames)

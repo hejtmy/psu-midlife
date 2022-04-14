@@ -1,5 +1,4 @@
-#' This loads, processes and saves data so that they are prepared for the shiny app and 
-#' reports
+#' This loads, processes and saves data so that they are prepared for the shiny app and reports
 library(googlesheets4)
 library(tidyverse)
 source("functions/fetch-online-data.R")
@@ -9,6 +8,11 @@ df_paper <- fetch_data_paper()
 df_german <- fetch_german_data()
 
 source("scripts/merge-german-online-data.R")
+
+## Recodes online variables -----
+df_online <- filter(df_online, povol != "thank the formr monkey")
+df_online <- readr::type_convert(df_online)
+
 source("scripts/merge-paper-online-data.R")
 
 dir.create("data/processed", showWarnings = FALSE)
