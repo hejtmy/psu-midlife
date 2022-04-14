@@ -1,6 +1,6 @@
 ## Setup
 
-The scripts require `tidyverse`, `googlesheets4` packages to run
+The scripts require `tidyverse`, `googlesheets4`, `here` packages to run
 - You need to have access to the online sheet
 - The scripts require the working directory to be set to the root of the project
 - unless you are uploading new data, you do not need any other data files present
