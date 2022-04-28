@@ -9,7 +9,7 @@ library(tidyverse)
 #'
 #' @examples
 process_data <- function(df_all, df_error){
-  # should be run first before any calculations are readded
+  # should be run first before any calculations are added
   df_all <- remove_erroneous_recordings(df_all, df_error)
   df_all <- df_all %>%
     add_missing_values() %>% 
@@ -53,7 +53,8 @@ process_demographics <- function(df_all){
   df_all$pohl <- ifelse(df_all$source == "paper", df_all$gender, df_all$pohl)
   df_all$gender <- NULL
   
-  df_all$vzdel <-  recode(df_all$vzdel, `1`="elementary", `2`="high school", `3`="university")
+  df_all$vzdel <-  recode(df_all$vzdel, `1`="elementary", 
+                          `2`="high school", `3`="university")
   
   return(df_all)
 }

@@ -33,9 +33,9 @@ df_online <- fetch_data_online()
 df_paper <- fetch_data_paper()
 ```
 
-These data frames be processed and merged using the `merge-paper-online-data.R` script,
-which outputs `df_all` dataframe. This can be saved and loaded next time `df_all` is 
-a semi edited file, basically just basic column renaming and class changes,
+These data frames be processed and merged using the `merge-german-online-data.R` and 
+`merge-paper-online-data.R` script, which outputs `df_all` dataframe. 
+`df_all` is a semi edited file, basically just basic column renaming and class changes,
 necessary to merge paper and online datasets.
 
 ```r

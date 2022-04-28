@@ -66,15 +66,27 @@ df_processed %>%
   t() %>% knitr::kable()
 ```
 ## Finanční situace
+```{r}
+questionnaire_plot <- function(data, question){
+  ggplot(df_processed, aes(x = {{question}}))) +
+  geom_bar(aes(y = after_stat(count/sum(count)))) +
+  scale_y_continuous(labels = percent, limits = c(0,0.5)) +
+  coord_flip() +
+  labels(x = get_question_text("e1")) +
+  geom_text(aes(x = e1, y = after_stat(count / sum(count)),
+                label = label_percent(accuracy = 1)(after_stat(count / sum(count)))), stat="count", hjust=-0.1)
+}
+```
+
 
 ```{r finances}
 ggplot(df_processed,aes(x = e1)) +
   geom_bar(aes(y = after_stat(count/sum(count)))) +
-  scale_y_continuous(labels = percent) +
+  scale_y_continuous(labels = percent, limits = c(0,0.5)) +
   coord_flip() +
+  labels(x = get_question_text("e1")) +
   geom_text(aes(x = e1, y = after_stat(count / sum(count)),
-                label = scales::label_percent()(after_stat(count / sum(count))),
-                position = "fill"))
+                label = label_percent(accuracy = 1)(after_stat(count / sum(count)))), stat="count", hjust=-0.1)
 ```
 
 
