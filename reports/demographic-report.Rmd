@@ -1,0 +1,103 @@
+---
+title: "Demographics reports"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(scales)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r}
+df_processed <- load_processed()
+df_processed <- df_processed %>%
+  filter(language=="czech",
+         !is.na(ended) | source == "paper",
+         vek > 40)
+```
+
+## Demografie
+```{r demo functions, echo=FALSE}
+
+```
+
+```{r plot vek}
+ggplot(df_processed, aes(vek)) +
+  geom_histogram(binwidth = 1)
+```
+
+?? remove Other? Only `r nrow(filter(df_processed, pohl=="O"))` observations.
+```{r plot gender}
+ggplot(df_processed, aes(pohl)) + 
+  geom_bar()
+```
+
+```{r demo vzdelani}
+df_processed %>%
+  filter(!is.na(vzdel)) %>%
+  ggplot(aes(vzdel)) +
+    geom_bar()
+
+df_processed %>%
+  group_by(vzdel) %>%
+  summarise(absolute = n(),
+            relative = label_percent(accuracy=0.1)(n()/nrow(df_processed))) %>%
+  knitr::kable()
+```
+
+```{r demo vira}
+df_processed %>%
+  ggplot(aes(vzdel)) +
+    geom_bar()
+
+df_processed %>%
+  group_by(vzdel) %>%
+  summarise(absolute = n(),
+            relative = label_percent(accuracy=0.1)(n()/nrow(df_processed))) %>%
+  knitr::kable()
+```
+
+```{r marital status}
+df_processed %>%
+  select(starts_with("family_"),
+         -family_s_total) %>%
+  summarise(across(everything(), ~label_percent()(mean(.x)))) %>%
+  t() %>% knitr::kable()
+```
+## Finanční situace
+
+```{r finances}
+ggplot(df_processed,aes(x = e1)) +
+  geom_bar(aes(y = after_stat(count/sum(count)))) +
+  scale_y_continuous(labels = percent) +
+  coord_flip() +
+  geom_text(aes(x = e1, y = after_stat(count / sum(count)),
+                label = scales::label_percent()(after_stat(count / sum(count))),
+                position = "fill"))
+```
+
+
+
+
+
+
+
+## Strach z nákazy
+
+## Volný čas a aktivity
+
+## Obavy
+
+## sekce zdraví
+
+## Panas
+
+## Rozdělit dle doby? měsíce?
+
+## stress a zvbládání
+
+## LCIS - události
+pohřeb, úmrtí
+
+

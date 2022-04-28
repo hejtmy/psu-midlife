@@ -1,0 +1,48 @@
+---
+title: "Goals and SWLS"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(GGally)
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+source(here("functions/questions.R"))
+source(here("functions/process.R"))
+source(here("functions/loading.R"))
+```
+
+```{r loading}
+df_question_categories <- read.table(here("data/processed/question-categories.csv"),
+                                     sep=";", header=TRUE)
+load_processed() %>%
+  filter(source == "online") %>%
+  count(language, is.na(ended))
+  
+df_processed <- load_processed() %>%
+  filter(!is.na(ended))
+```
+
+```{r}
+df_goals <- select(df_processed, starts_with("goals_s"))
+```
+
+```{r}
+df_goals %>%
+  pivot_longer(everything()) %>%
+  ggplot(aes(value, group=name)) +
+    geom_histogram(aes(y=..density..)) +
+    geom_density() +
+    facet_wrap(~name)
+```
+```{r}
+select(df_processed, starts_with("goals_s"), pohl) %>%
+  filter(pohl != "O") %>%
+  pivot_longer(-pohl) %>%
+  ggplot(aes(x=pohl, y=value, fill=pohl, color=pohl)) +
+    geom_boxplot() +
+    geom_jitter() + 
+    facet_wrap(~name)
+```
+```
+
