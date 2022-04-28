@@ -4,7 +4,7 @@ df_german <- df_german %>%
   select(-c(giveaway, interview_consent, longterm_consent, 
             charity, partner_widow_age))
 
-# Adding lcis columns
+# Adding lcis columns --------
 df_german <- df_german %>%
   add_column(lcis1_freq = NA, .after = "lcis1") %>%
   add_column(lcis2_freq = NA, .after = "lcis2") %>% 
@@ -12,8 +12,8 @@ df_german <- df_german %>%
   add_column(lcis7_freq = NA, .after = "lcis7") %>% 
   add_column(lcis12_freq = NA, .after = "lcis12")
 
-
 colnames(df_german) <- colnames(select(df_online, -ident))
+
 df_german <- df_german %>%
   mutate(vek=as.character(vek),
          wid_len=as.character(wid_len),

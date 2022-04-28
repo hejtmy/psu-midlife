@@ -23,7 +23,7 @@ paper_rename_cols <- rbind(paper_rename_cols,
     c("edu01", "vzdel"),
     c("edu02", "vzdel_roky"))
 
-## Recoding povolani ------
+## Recoding povolani ----------
 df_online <- df_online %>%
   mutate(occup_stable = grepl("1", zamest),
          occup_freelance = grepl("2", zamest),
@@ -36,7 +36,7 @@ paper_rename_cols <- rbind(paper_rename_cols,
   c("occup01c", "occup_unemployed"),
   c("occup01d", "occup_socialwelfare"))
 
-## Relig -----
+## Relig --------
 paper_rename_cols <- rbind(paper_rename_cols,
       c("relig01", "vira"),
       c("relig02", "cira_vyz"),
@@ -109,6 +109,10 @@ df_online <- df_online %>%
   mutate_at(vars(matches("da\\d")), ~as.double(as.character(.))) %>%
   mutate_at(vars(starts_with("lcis")), ~as.double(.))
 
+# Activities ---------
+# Activities are coded as 0 1 in paper, but 1 or 2 in online
+df_online <- df_online %>%
+  mutate(across(starts_with("cin"), ~.x - 1))
 
 
 # Source -----------
