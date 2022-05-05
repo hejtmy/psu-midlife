@@ -5,8 +5,16 @@ output: html_document
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(here)
 library(scales)
 knitr::opts_chunk$set(echo = FALSE)
+source(here("functions/questions.R"))
+source(here("functions/process.R"))
+source(here("functions/loading.R"))
+load_questions()
+library(hrbrthemes)
+library(ggthemr)
+ggthemr("fresh")
 ```
 
 ```{r}
@@ -46,18 +54,6 @@ df_processed %>%
   knitr::kable()
 ```
 
-```{r demo vira}
-df_processed %>%
-  ggplot(aes(vzdel)) +
-    geom_bar()
-
-df_processed %>%
-  group_by(vzdel) %>%
-  summarise(absolute = n(),
-            relative = label_percent(accuracy=0.1)(n()/nrow(df_processed))) %>%
-  knitr::kable()
-```
-
 ```{r marital status}
 df_processed %>%
   select(starts_with("family_"),
@@ -65,39 +61,74 @@ df_processed %>%
   summarise(across(everything(), ~label_percent()(mean(.x)))) %>%
   t() %>% knitr::kable()
 ```
+
 ## Finanční situace
 ```{r}
 questionnaire_plot <- function(data, question){
-  ggplot(df_processed, aes(x = {{question}}))) +
+  max_val <- ceiling(max(table(df_processed[[question]])/nrow(df_processed))*10)/10
+  plt <- ggplot(df_processed, aes_string(x = question)) +
   geom_bar(aes(y = after_stat(count/sum(count)))) +
-  scale_y_continuous(labels = percent, limits = c(0,0.5)) +
+  scale_y_continuous(labels = percent, limits = c(0, max_val)) +
   coord_flip() +
-  labels(x = get_question_text("e1")) +
-  geom_text(aes(x = e1, y = after_stat(count / sum(count)),
-                label = label_percent(accuracy = 1)(after_stat(count / sum(count)))), stat="count", hjust=-0.1)
+  labs(y = str_wrap(get_question_text(question), 80),
+       x = "") +
+  scale_x_continuous(breaks = c(1, get_question_max_value(question)),
+                     labels = c(get_question_labels(question)[c(1, get_question_max_value(question))])) +
+  geom_text(aes(x = .data[[question]], y = after_stat(count / sum(count)),
+                label = label_percent(accuracy = 1)(after_stat(count / sum(count)))),
+            stat="count", hjust =-0.1, color = grey(0.2))
+  return(plt)
 }
 ```
 
-
 ```{r finances}
-ggplot(df_processed,aes(x = e1)) +
-  geom_bar(aes(y = after_stat(count/sum(count)))) +
-  scale_y_continuous(labels = percent, limits = c(0,0.5)) +
-  coord_flip() +
-  labels(x = get_question_text("e1")) +
-  geom_text(aes(x = e1, y = after_stat(count / sum(count)),
-                label = label_percent(accuracy = 1)(after_stat(count / sum(count)))), stat="count", hjust=-0.1)
+questionnaire_plot(df_processed, "e1") 
+questionnaire_plot(df_processed, "e2")
 ```
 
-
-
-
-
-
-
 ## Strach z nákazy
+```{r}
+health <- c("z1", "z2", "z3", "z4", "z5")
+sapply(health, function(x){print(questionnaire_plot(df_processed, x))})
+```
 
 ## Volný čas a aktivity
+```{r}
+cinnost_plot <- function(cinnost, df_data){
+  plt <- df_data %>%
+  filter(!is.na({{cinnost}})) %>%
+  mutate(val = ifelse({{cinnost}} == 1, "ano", "ne")) %>%
+  count(val) %>%
+  mutate(prop = n / sum(n),
+         ypos = cumsum(prop)- 0.5*prop,
+         lab = paste0(val,"\n(",label_percent(accuracy = 1)(prop), ")")) %>%
+  ggplot(aes(x="", y=prop, fill=val)) +
+    geom_bar(stat="identity") +
+    geom_text(aes(y = ypos, x = 1, label = lab), color = "white", size=6) +
+    coord_polar("y", start=0) +
+    theme_void() + 
+    theme(legend.position="none")
+  return(plt)
+}
+
+```
+
+```{r}
+cinnost_plot(df_processed, "cin1")
+df_processed %>%
+  filter(!is.na(cin1)) %>%
+  mutate(val = ifelse(cin1 == 1, "ano", "ne")) %>%
+  count(val) %>%
+  mutate(prop = n / sum(n),
+         ypos = cumsum(prop)- 0.5*prop,
+         lab = paste0(val,"\n(",label_percent(accuracy = 1)(prop), ")")) %>%
+  ggplot(aes(x="", y=prop, fill=val)) +
+    geom_bar(stat="identity") +
+    geom_text(aes(y = ypos, x = 1, label = lab), color = "white", size=6) +
+    coord_polar("y", start=0) +
+    theme_void() + 
+    theme(legend.position="none")
+```
 
 ## Obavy
 

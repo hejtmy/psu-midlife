@@ -10,12 +10,13 @@ library(tidyverse)
 library(here)
 library(psych)
 library(correlation)
-```
-
-```{r loading}
 source(here("functions/questions.R"))
 source(here("functions/process.R"))
 source(here("functions/loading.R"))
+```
+
+```{r loading}
+
 df_question_categories <- read.table(here("data/processed/question-categories.csv"),
                                      sep=";", header=TRUE)
 df_processed <- load_processed()
