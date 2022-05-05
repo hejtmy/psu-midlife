@@ -31,6 +31,7 @@ get_question_max_value <- function(question_codes){
   func <- function(question_code){
     question_data <- get_question_data(question_code)
     val <- sum(!is.na(select(question_data, starts_with("choices"))))
+    val <- as.numeric(val)
     return(val)
   }
   return(sapply(question_codes, func))
@@ -78,10 +79,10 @@ get_question_data <- function(question_codes){
 #'
 #' @examples
 load_questions <- function(){
-  QUESTIONS <<- jsonlite::fromJSON(file("data/MIDLIFE.json"))
+  QUESTIONS <<- jsonlite::fromJSON(file(here("data/MIDLIFE.json")))
 }
 
-#' Returns codes of valid quesitions (minus controls, summaries)
+#' Returns codes of valid questions (minus controls, summaries)
 #'
 #' @param questionnaire 
 #' @param df_data 
