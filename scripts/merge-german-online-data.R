@@ -1,7 +1,7 @@
 # This expects the xlsx file to be present
 
 df_german <- df_german %>%
-  select(-c(giveaway, interview_consent, longterm_consent, 
+  select(-c(giveaway, interview_consent, longterm_consent,
             charity, partner_widow_age))
 
 # Adding lcis columns --------

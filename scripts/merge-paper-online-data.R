@@ -7,12 +7,15 @@ df_paper <- mutate(df_paper, language = "czech")
 df_online <- select(df_online, ident, everything())
 i_start <- which(colnames(df_online) == "e1")
 online_colnames <- colnames(df_online[i_start:ncol(df_online)])
+## control questions
 online_colnames <- online_colnames[!grepl("_cont", online_colnames)]
+## contact details
 online_colnames <- online_colnames[!grepl("kont_", online_colnames)]
 
 i_start <- which(colnames(df_paper) == "e01")
 paper_colnames <- colnames(df_paper[i_start:ncol(df_paper)])
 paper_colnames <- paper_colnames[!grepl("lcis_jine", paper_colnames)]
+#View(data.frame(online_colnames, paper_colnames))
 
 paper_rename_cols <- data.frame(orig = paper_colnames, new = online_colnames)
 
@@ -113,7 +116,6 @@ df_online <- df_online %>%
 # Activities are coded as 0 1 in paper, but 1 or 2 in online
 df_online <- df_online %>%
   mutate(across(starts_with("cin"), ~.x - 1))
-
 
 # Source -----------
 df_paper <- mutate(df_paper, source = "paper")
