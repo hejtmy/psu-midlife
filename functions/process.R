@@ -13,6 +13,7 @@ process_data <- function(df_all, df_error){
   df_all <- remove_erroneous_recordings(df_all, df_error)
   df_all <- df_all %>%
     add_missing_values() %>% 
+    calculate_control_score() %>%
     process_demographics() %>%
     process_work_scale() %>%
     process_finance_scale() %>%
@@ -39,6 +40,12 @@ process_data <- function(df_all, df_error){
     process_swls() %>% 
     process_zftp()
   return(df_all)
+}
+
+# Calculates how many control questions did the participant 
+# fail to fill in correctly
+calculate_control_score <- function(df_all){
+  
 }
 
 # Returns reversed value for an input given min max
