@@ -85,7 +85,10 @@ process_lcis_kol <- function(df_all){
 
 process_lcis_values <- function(df_all){
   ## ADD MULTIPLIERS HERE
-  MULTIPLIERS <- rep(1, 45)
+  MULTIPLIERS <- rep(100, 73, 65, 63, 63, 53, 50, 75, 48, 47, 45, 45, 44, 40, 
+                     39, 39, 39, 38, 37, 36, 35, 31, 30, 29, 29, 29, 28, 26, 
+                     26, 25, 24, 23, 20, 20, 20, 19, 19, 19, 17, 16, 15, 15, 
+                     13, 12, 11)
   for(i in seq_len(length(MULTIPLIERS))){
     weight_name <- sprintf("lcis%d_s_weight", i)
     computed_weight_name <- sprintf("lcis%d_s_computedweigth", i)
