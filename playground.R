@@ -34,3 +34,11 @@ colnames(df_all)
 df_all %>%
   mutate(cs_s_score = reversed(cs1, 6) + cs2 + reversed(cs3,6) + reversed(cs4, 6)) %>%
   select(starts_with("cs"))
+
+
+library(tidyverse)
+df_online %>% 
+  mutate(panas_sum = rowSums(across(starts_with("panas")), na.rm = TRUE)) %>%
+  select(starts_with("panas")) %>%
+  head() %>%
+  View()
