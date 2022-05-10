@@ -45,7 +45,7 @@ process_data <- function(df_all, df_error){
 # Calculates how many control questions did the participant 
 # fail to fill in correctly
 calculate_control_score <- function(df_all){
-  
+  return(df_all)
 }
 
 # Returns reversed value for an input given min max
@@ -92,7 +92,7 @@ process_lcis_kol <- function(df_all){
 
 process_lcis_values <- function(df_all){
   ## ADD MULTIPLIERS HERE
-  MULTIPLIERS <- rep(100, 73, 65, 63, 63, 53, 50, 75, 48, 47, 45, 45, 44, 40, 
+  MULTIPLIERS <- c(100, 73, 65, 63, 63, 53, 50, 75, 48, 47, 45, 45, 44, 40, 
                      39, 39, 39, 38, 37, 36, 35, 31, 30, 29, 29, 29, 28, 26, 
                      26, 25, 24, 23, 20, 20, 20, 19, 19, 19, 17, 16, 15, 15, 
                      13, 12, 11)
