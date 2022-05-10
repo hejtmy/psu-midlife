@@ -1,0 +1,73 @@
+---
+title: "participant-interview-selection"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = '../')
+library(tidyverse)
+library(here)
+library(psych)
+library(correlation)
+```
+
+```{r loading}
+source(here("functions/questions.R"))
+source(here("functions/process.R"))
+source(here("functions/loading.R"))
+df_midlife <- load_processed() %>%
+  filter(source == "paper")
+```
+
+## Způsob výpočtu
+1. normalizace panas hedonic a swls skóre 
+2. součet normalizovaných hodnot a vytvoření průměrného z skóre spokojenosti
+3. normalizace brs - -> z skóre resilience
+4. normalizace dids škál 
+5. součet normalizovaných dids (odečet dids ruminace) -> průměrný z skór identity
+6. průměr resilience + identity + spokojenosti => nejlepší z nejlepších
+
+
+```{r}
+df_selection <- df_midlife %>%
+  select(ident,
+         panas_s_hedonic, swls_s_satifaction,
+         brs_s_total,
+         starts_with("dids_s_")) %>%
+  mutate(panas_z_hedonic = scale(panas_s_hedonic),
+         swls_z_satisfaction = scale(swls_s_satifaction),
+         z_satisfaction = (panas_z_hedonic + swls_z_satisfaction)/2,
+         z_resilience = scale(brs_s_total),
+         across(starts_with("dids_s_"), scale, .names = "{gsub('dids_s', 'dids_z',{.col})}"),
+         dids_z_ruminative_exploration = -dids_z_ruminative_exploration) %>%
+  rowwise() %>%
+  mutate(z_identity = sum(across(starts_with("dids_z_")), na.rm = TRUE)/5) %>%
+  ungroup() %>%
+  select(-matches("_[sz]_")) %>%
+  mutate(z_average = (z_identity + z_resilience + z_satisfaction)/3)
+```
+
+```{r}
+df_selection %>%
+  select(-ident) %>%
+  pivot_longer(everything()) %>%
+  ggplot(aes(value)) + geom_histogram(binwidth = 0.1) +
+  facet_wrap(~name)
+```
+## Nejlepší z nejlepších
+```{r}
+df_selection %>%
+  arrange(-z_average) %>%
+  select(ident, z_average) %>%
+  head(20) %>%
+  knitr::kable()
+```
+## Nejhorší z nejhorších
+```{r}
+df_selection %>%
+  arrange(z_average) %>%
+  select(ident, z_average) %>%
+  head(20) %>%
+  knitr::kable()
+```
