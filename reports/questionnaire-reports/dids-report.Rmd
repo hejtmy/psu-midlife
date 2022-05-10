@@ -40,8 +40,8 @@ fa.parallel(df_dids_items, fa="fa")
 
 
 ```{r}
-fit <- factanal(df_dids_items[complete.cases(df_dids_items),], 5, rotation="promax")
-fit <- fa(df_dids_items, nfactors=5, rotate="varimax")
+fit <- factanal(df_dids_items[complete.cases(df_dids_items),], 4, rotation="promax")
+fit <- fa(df_dids_items, nfactors=4, rotate="varimax")
 print(fit, digits=2, cutoff=0.3, sort=TRUE)
 ```
 dids_s_commitment_making = dids_01 + dids_02 + dids_03 + dids_04 + dids_05

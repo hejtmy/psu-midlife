@@ -1,0 +1,53 @@
+---
+title: "Untitled"
+author: "Lukáš Hejtmánek"
+date: "10 5 2022"
+output: html_document
+---
+
+```{r}
+library(here)
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+source(here("functions/questions.R"))
+source(here("functions/process.R"))
+source(here("functions/loading.R"))
+library(GGally)
+library(psych)
+library(correlation)
+```
+
+```{r loading}
+df_question_categories <- read.table(here("data/processed/question-categories.csv"),
+                                     sep=";", header=TRUE)
+df_processed <- load_processed() %>%
+  filter(!is.na(ended))
+
+df_processed <- filter(df_processed, language == "czech")
+```
+
+```{r factor analysis}
+df_panas_items <- select(df_processed, get_question_codes("panas", df_processed))
+ggcorr(df_panas_items, method = c("everything", "pearson")) 
+```
+
+```{r}
+KMO(df_panas_items)
+eigen(cor(df_panas_items, use = "complete.obs"))
+scree(df_panas_items, pc=FALSE)
+fa.parallel(df_panas_items, fa="fa")
+```
+
+```{r}
+fit <- factanal(df_panas_items[complete.cases(df_panas_items),], 4, rotation="promax")
+fit <- fa(df_panas_items, nfactors=2, rotate="varimax")
+print(fit, digits=2, cutoff=0.3, sort=TRUE)
+```
+
+panas_s_positive = (panas_01 + panas_03 + panas_05 + panas_09 + panas_10 + panas_12 + panas_15 + panas_17 + panas_18 + panas_20) / 10,
+panas_s_negative = (panas_02 + panas_04 + panas_06 + panas_07 + panas_08 + panas_11 + panas_14 + panas_16 + panas_19 + panas_21) / 10,
+
+```{r diagram ,fig.height=8, fig.width=6}
+loads <- fit$loadings
+fa.diagram(loads)
+```
