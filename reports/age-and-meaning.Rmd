@@ -16,3 +16,19 @@ library(GGally)
 library(psych)
 library(correlation)
 ```
+
+```{r}
+df_question_categories <- read.table(here("data/processed/question-categories.csv"),
+                                     sep=";", header=TRUE)
+df_processed <- load_processed() %>%
+  filter(!is.na(ended)) %>%
+  filter(language == "czech")
+```
+
+
+```{r}
+df_processed %>%
+  filter(vek > 35) %>%
+  ggplot(aes(vek, mlq_s_search)) + geom_point() + geom_smooth(method="lm")
+
+```
