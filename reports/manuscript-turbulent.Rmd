@@ -1,0 +1,27 @@
+---
+title: "manuscript-turbulence"
+output: html_document
+---
+```{r}
+
+```
+## Turbulent search for life or nothing speci?l:
+
+### Mlq
+there is a tendency to assume that middle life is tied to a search for meaning.
+
+```{r}
+
+```
+
+## Identity crisis
+The other assumption is that midlife is somehow connected to the crisis of 
+```{r}
+
+```
+
+
+# Discussion
+Given our sample, it is possible that the midlife, as it is understood in the popular culture and as it is being marketed to us is happening sooner than 40 years. By 40, people have their goals, meaning and identity sorted out nad no other significant changes and generative processes are taking place. This is in contrast to the 
+
+
