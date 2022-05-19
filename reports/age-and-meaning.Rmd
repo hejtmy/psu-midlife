@@ -21,14 +21,42 @@ library(correlation)
 df_question_categories <- read.table(here("data/processed/question-categories.csv"),
                                      sep=";", header=TRUE)
 df_processed <- load_processed() %>%
-  filter(!is.na(ended)) %>%
+  filter(!is.na(ended),
+         vek > 35) %>%
   filter(language == "czech")
 ```
 
 
 ```{r}
 df_processed %>%
-  filter(vek > 35) %>%
-  ggplot(aes(vek, mlq_s_search)) + geom_point() + geom_smooth(method="lm")
+  ggplot(aes(vek, mlq_s_search)) + geom_point() +
+    geom_smooth(method="lm")
+```
 
+```{r}
+df_processed %>%
+  filter(pohl != "O") %>%
+  ggplot(aes(vek, mlq_s_search, color=pohl)) + 
+    geom_point() +
+    geom_smooth(method="lm")
+```
+
+```{r}
+glm_mlqsearch_pohl_vek <- glm(mlq_s_search ~ vek * pohl, 
+                               data = filter(df_processed, pohl != "O"))
+summary(glm_mlqsearch_pohl_vek)
+```
+
+```{r}
+df_processed %>%
+  filter(vzdel != "elementary") %>%
+  ggplot(aes(vek, mlq_s_search, color=vzdel)) + 
+    geom_point() +
+    geom_smooth(method="lm")
+```
+
+```{r}
+glm_mlqsearch_vzdel_vek <- glm(mlq_s_search ~ vek * vzdel, 
+                               data = filter(df_processed, vzdel != "elementary"))
+summary(glm_mlqsearch_vzdel_vek)
 ```
