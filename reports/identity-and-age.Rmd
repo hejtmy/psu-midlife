@@ -1,0 +1,25 @@
+---
+title: "identity-and-age"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(tidyverse)
+source(here("functions/questions.R"))
+source(here("functions/process.R"))
+source(here("functions/loading.R"))
+library(GGally)
+library(psych)
+library(correlation)
+```
+
+```{r}
+df_question_categories <- read.table(here("data/processed/question-categories.csv"),
+                                     sep=";", header=TRUE)
+df_processed <- load_processed() %>%
+  filter(!is.na(ended),
+         vek > 35) %>%
+  filter(language == "czech")
+```
