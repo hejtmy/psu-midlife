@@ -12,9 +12,6 @@ source(here("functions/questions.R"))
 source(here("functions/process.R"))
 source(here("functions/loading.R"))
 load_questions()
-library(hrbrthemes)
-library(ggthemr)
-ggthemr("fresh")
 ```
 
 ```{r}
@@ -32,7 +29,8 @@ df_processed <- df_processed %>%
 
 ```{r plot vek}
 ggplot(df_processed, aes(vek)) +
-  geom_histogram(binwidth = 1)
+  geom_histogram(binwidth = )
+
 ```
 
 ?? remove Other? Only `r nrow(filter(df_processed, pohl=="O"))` observations.
@@ -79,6 +77,22 @@ questionnaire_plot <- function(data, question){
             stat="count", hjust =-0.1, color = grey(0.2))
   return(plt)
 }
+
+questionnaire_plot <- function(data, question){
+  max_val <- ceiling(max(table(df_processed[[question]])/nrow(df_processed))*10)/10
+  plt <- ggplot(df_processed, aes_string(x = question)) +
+  geom_bar(aes(y = after_stat(count/sum(count)))) +
+  scale_y_continuous(labels = percent, limits = c(0, max_val)) +
+  coord_flip() +
+  labs(y = str_wrap(get_question_text(question), 80),
+       x = "") +
+  scale_x_continuous(breaks = c(1, get_question_max_value(question)),
+                     labels = c(get_question_labels(question)[c(1, get_question_max_value(question))])) +
+  geom_text(aes(x = .data[[question]], y = after_stat(count / sum(count)),
+                label = label_percent(accuracy = 1)(after_stat(count / sum(count)))),
+            stat="count", hjust =-0.1, color = grey(0.2))
+  return(plt)
+}
 ```
 
 ```{r finances}
@@ -94,7 +108,7 @@ sapply(health, function(x){print(questionnaire_plot(df_processed, x))})
 
 ## Volný čas a aktivity
 ```{r}
-cinnost_plot <- function(cinnost, df_data){
+cinnost_plot <- function(df_data, cinnost){
   plt <- df_data %>%
   filter(!is.na({{cinnost}})) %>%
   mutate(val = ifelse({{cinnost}} == 1, "ano", "ne")) %>%
@@ -114,7 +128,16 @@ cinnost_plot <- function(cinnost, df_data){
 ```
 
 ```{r}
-cinnost_plot(df_processed, "cin1")
+cinnost_plot(df_processed, "cin2")
+
+df_processed$cin1 == 1
+cinnost <- "cin2"
+
+df_processed %>%
+  filter(!is.na(df_processed[[cinnost]])) %>% 
+  mutate(val = ifelse(df_processed[[cinnost]] == 1, "ano", "ne")) %>%
+  count(val)
+
 df_processed %>%
   filter(!is.na(cin1)) %>%
   mutate(val = ifelse(cin1 == 1, "ano", "ne")) %>%

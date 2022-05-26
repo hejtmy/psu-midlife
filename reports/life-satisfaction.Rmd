@@ -26,8 +26,9 @@ df_processed %>%
   filter(!is.na(ident)) %>%
   select(ident, starts_with("LS")) %>%
   pivot_longer(-ident) %>%
-  ggplot(aes(name, value, color=ident, group=ident)) + geom_line() +
-  guides(color="none")
+  ggplot(aes(name, value, color=ident, group=ident)) +
+    geom_line() + geom_point() +
+    guides(color="none")
 ```
 
 ```{r}
@@ -37,6 +38,9 @@ df_processed %>%
   pivot_longer(-ident) %>%
   ggplot(aes(name, value)) + geom_boxplot() +
     geom_jitter(width = 0.2, alpha = 0.1)
+
+
+
 ```
 
 ```{r}
@@ -56,3 +60,14 @@ df_processed %>%
   ggplot(aes(name, value, fill=pohl, color=pohl)) + geom_boxplot() +
     geom_jitter(width = 0.2, alpha = 0.1)
 ```
+
+```{r}
+df_processed %>%
+  select(ident, vek, starts_with("LS")) %>%
+  pivot_longer(-c(ident, vek)) %>%
+  mutate(a = str_match(name, "ls(\\d+)_(\\d+)")[2]) %>%
+  head()
+
+str_match(c("ls0_12", "ls5_12"), "ls(\\d+)_(\\d+)")[3]
+```
+

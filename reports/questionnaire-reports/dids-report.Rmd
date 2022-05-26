@@ -22,7 +22,6 @@ df_question_categories <- read.table(here("data/processed/question-categories.cs
 df_processed <- load_processed() %>%
   filter(!is.na(ended))
 
-
 df_processed <- filter(df_processed, language == "czech")
 ```
 
