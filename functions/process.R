@@ -82,10 +82,12 @@ process_panas <- function(df_all){
 process_lcis_kol <- function(df_all){
   LCIS_QUESTIONS <- 45
   for(i in seq_len(LCIS_QUESTIONS)){
-    checked_yes <- df_all[[sprintf("lcis%d", i)]] == 1
+    checked_yes <- !is.na(df_all[[sprintf("lcis%d", i)]]) & df_all[[sprintf("lcis%d", i)]] == 1
+    assumed_no <- df_all[[sprintf("lcis%d", i)]] == 0 | is.na(df_all[[sprintf("lcis%d", i)]])
     old_value <- df_all[[sprintf("lcis%d_kol", i)]]
     new_kol_name <- sprintf("lcis%d_s_computedkol", i)
     df_all[[new_kol_name]] <- ifelse(checked_yes & is.na(old_value), 1, old_value)
+    df_all[[new_kol_name]][assumed_no] <- 0
   }
   return(df_all)
 }

@@ -12,6 +12,9 @@ source(here("functions/questions.R"))
 source(here("functions/process.R"))
 source(here("functions/loading.R"))
 load_questions()
+library(plotly)
+
+COLORS <- c("#22323e", "#22323e", "#2a587c", "#416b8b", "#dfe8f1", "#cdd0df")
 ```
 
 ```{r}
@@ -30,7 +33,6 @@ df_processed <- df_processed %>%
 ```{r plot vek}
 ggplot(df_processed, aes(vek)) +
   geom_histogram(binwidth = )
-
 ```
 
 ?? remove Other? Only `r nrow(filter(df_processed, pohl=="O"))` observations.
@@ -65,44 +67,189 @@ df_processed %>%
 questionnaire_plot <- function(data, question){
   max_val <- ceiling(max(table(df_processed[[question]])/nrow(df_processed))*10)/10
   plt <- ggplot(df_processed, aes_string(x = question)) +
-  geom_bar(aes(y = after_stat(count/sum(count)))) +
-  scale_y_continuous(labels = percent, limits = c(0, max_val)) +
-  coord_flip() +
-  labs(y = str_wrap(get_question_text(question), 80),
-       x = "") +
-  scale_x_continuous(breaks = c(1, get_question_max_value(question)),
-                     labels = c(get_question_labels(question)[c(1, get_question_max_value(question))])) +
-  geom_text(aes(x = .data[[question]], y = after_stat(count / sum(count)),
-                label = label_percent(accuracy = 1)(after_stat(count / sum(count)))),
-            stat="count", hjust =-0.1, color = grey(0.2))
+    geom_bar(aes(y = after_stat(count/sum(count)))) +
+    scale_y_continuous(labels = percent, limits = c(0, max_val)) +
+    coord_flip() +
+    labs(y = str_wrap(get_question_text(question), 80),
+         x = "") +
+    scale_x_continuous(breaks = c(1, get_question_max_value(question)),
+                       labels = c(get_question_labels(question)[c(1, get_question_max_value(question))])) +
+    geom_text(aes(x = .data[[question]], y = after_stat(count / sum(count)),
+                  label = label_percent(accuracy = 1)(after_stat(count / sum(count)))),
+              stat="count", hjust =-0.1, color = grey(0.2))
   return(plt)
 }
 
 questionnaire_plot <- function(data, question){
   max_val <- ceiling(max(table(df_processed[[question]])/nrow(df_processed))*10)/10
   plt <- ggplot(df_processed, aes_string(x = question)) +
-  geom_bar(aes(y = after_stat(count/sum(count)))) +
-  scale_y_continuous(labels = percent, limits = c(0, max_val)) +
-  coord_flip() +
-  labs(y = str_wrap(get_question_text(question), 80),
-       x = "") +
-  scale_x_continuous(breaks = c(1, get_question_max_value(question)),
-                     labels = c(get_question_labels(question)[c(1, get_question_max_value(question))])) +
-  geom_text(aes(x = .data[[question]], y = after_stat(count / sum(count)),
-                label = label_percent(accuracy = 1)(after_stat(count / sum(count)))),
-            stat="count", hjust =-0.1, color = grey(0.2))
+    geom_bar(aes(y = after_stat(count/sum(count)))) +
+    scale_y_continuous(labels = percent, limits = c(0, max_val)) +
+    coord_flip() +
+    labs(y = str_wrap(get_question_text(question), 80),
+         x = "") +
+    scale_x_continuous(breaks = c(1, get_question_max_value(question)),
+                       labels = c(get_question_labels(question)[c(1, get_question_max_value(question))])) +
+    geom_text(aes(x = .data[[question]], y = after_stat(count / sum(count)),
+                  label = label_percent(accuracy = 1)(after_stat(count / sum(count)))),
+              stat="count", hjust =-0.1, color = grey(0.2))
   return(plt)
 }
+
 ```
 
+```{r}
+df_data <- df_processed %>%
+  select(c("z1", "z2", "z3", "z4", "z5")) %>%
+  pivot_longer(everything()) %>%
+  filter(!is.na(value)) %>%
+  count(name, value) %>%
+  group_by(name) %>%
+  mutate(name = get_question_text(name),
+         ratio = n/sum(n),
+         percent = round(ratio*100, 2),
+         name = sapply(name, function(x){paste(strwrap(x, width = 64), collapse = "<br>")}, USE.NAMES = FALSE),
+         name = unname(name)) %>%
+  select(y = name, value, percent) %>%
+  pivot_wider(names_from = value, names_prefix = "x", values_from = percent)
+
+y <- c('The course was effectively<br>organized',
+       'The course developed my<br>abilities and skills for<br>the subject',
+       'The course developed my<br>ability to think critically about<br>the subject',
+       'I would recommend this<br>course to a friend')
+x1 <- c(21, 24, 27, 29) ##strongly agree
+x2 <-c(30, 31, 26, 24)
+x3 <- c(21, 19, 23, 15)
+x4 <- c(16, 15, 11, 18)
+x5 <- c(12, 11, 13, 14) #strongly disagree
+
+top_labels <- c('Strongly<br>agree', 'Agree', 'Neutral', 'Disagree', 'Strongly<br>disagree')
+top_labels <- get_question_labels("z1")
+
+data <- as.data.frame(df_data)
+
+y <- df_data$y
+x1 <- data$x1
+x2 <- data$x2
+x3 <- data$x3
+x4 <- data$x4
+x5 <- data$x5
+x6 <- data$x6
+
+fig <- plot_ly(data, x = ~x1, y = ~y, type = 'bar', orientation = 'h',
+        marker = list(color = 'rgba(38, 24, 74, 0.8)',
+                      line = list(color = 'rgb(248, 248, 249)', width = 1))) 
+fig <- fig %>% add_trace(x = ~x2, marker = list(color = 'rgba(71, 58, 131, 0.8)')) 
+fig <- fig %>% add_trace(x = ~x3, marker = list(color = 'rgba(122, 120, 168, 0.8)')) 
+fig <- fig %>% add_trace(x = ~x4, marker = list(color = 'rgba(164, 163, 204, 0.85)'))
+fig <- fig %>% add_trace(x = ~x5, marker = list(color = 'rgba(190, 192, 213, 1)'))
+fig <- fig %>% add_trace(x = ~x6, marker = list(color = 'rgba(190, 192, 213, 1)'))
+
+fig
+fig <- fig %>% layout(xaxis = list(title = "",
+                      showgrid = FALSE,
+                      showline = FALSE,
+                      showticklabels = FALSE,
+                      zeroline = FALSE,
+                      domain = c(0.15, 1)),
+         yaxis = list(title = "",
+                      showgrid = FALSE,
+                      showline = FALSE,
+                      showticklabels = FALSE,
+                      zeroline = FALSE),
+         barmode = 'stack',
+         paper_bgcolor = 'rgb(248, 248, 255)', plot_bgcolor = 'rgb(248, 248, 255)',
+         margin = list(l = 300, r = 10, t = 140, b = 80),
+         showlegend = FALSE) 
+  # labeling the y-axis
+fig <- fig %>% add_annotations(xref = 'paper', yref = 'y', x = 0.14, y = y,
+                  xanchor = 'right', text = y,
+                  font = list(family = 'Arial', size = 12,
+                            color = 'rgb(67, 67, 67)'),
+                  uniformtext_minsize=8,
+                  showarrow = FALSE, align = 'right')
+  # labeling the percentages of each bar (x_axis)
+
+last_x <- 0
+for(name in str_c("x",1:6)){
+  fig <- fig %>% add_annotations(xref = 'x', yref = 'y',
+                  x = , y = y,
+                  text = paste(data[,"x1"], '%'),
+                  font = list(family = 'Arial', size = 12,
+                            color = 'rgb(248, 248, 255)'),
+                  uniformtext_minsize=8,
+                  showarrow = FALSE)
+}
+
+
+fig <- fig %>% add_annotations(xref = 'x', yref = 'y',
+                  x = x1 / 2, y = y,
+                  text = paste(data[,"x1"], '%'),
+                  font = list(family = 'Arial', size = 12,
+                            color = 'rgb(248, 248, 255)'),
+                  uniformtext_minsize=8,
+                  showarrow = FALSE) 
+
+fig <- fig %>% add_annotations(xref = 'x', yref = 'y',
+                  x = x1 + x2 / 2, y = y,
+                  text = paste(data[,"x2"], '%'),
+                  font = list(family = 'Arial', size = 12,
+                              color = 'rgb(248, 248, 255)'),
+                  uniformtext_minsize=8,
+                  showarrow = FALSE) 
+fig <- fig %>% add_annotations(xref = 'x', yref = 'y',
+                  x = x1 + x2 + x3 / 2, y = y,
+                  text = paste(data[,"x3"], '%'),
+                  font = list(family = 'Arial', size = 12,
+                              color = 'rgb(248, 248, 255)'),
+                  
+                  uniformtext_minsize=8,
+                  showarrow = FALSE) 
+fig <- fig %>% add_annotations(xref = 'x', yref = 'y',
+                  x = x1 + x2 + x3 + x4 / 2, y = y,
+                  text = paste(data[,"x4"], '%'),
+                  font = list(family = 'Arial', size = 12,
+                              color = 'rgb(248, 248, 255)'),
+                  uniformtext_minsize=8,
+                  showarrow = FALSE) 
+fig <- fig %>% add_annotations(xref = 'x', yref = 'y',
+                  x = x1 + x2 + x3 + x4 + x5 / 2, y = y,
+                  text = paste(data[,"x5"], '%'),
+                  font = list(family = 'Arial', size = 12,
+                              color = 'rgb(248, 248, 255)'),
+                  uniformtext_minsize=8,
+                  showarrow = FALSE) 
+fig <- fig %>% add_annotations(xref = 'x', yref = 'y',
+                  x = x1 + x2 + x3 + x4 + x5 + x6 / 2, y = y,
+                  text = paste(data[,"x5"], '%'),
+                  font = list(family = 'Arial', size = 12,
+                              color = 'rgb(248, 248, 255)'),
+                  uniformtext_minsize=8,
+                  showarrow = FALSE) 
+  # labeling the first Likert scale (on the top)
+fig <- fig %>% add_annotations(xref = 'x', yref = 'paper',
+                  x = c(21 / 2, 21 + 30 / 2, 21 + 30 + 21 / 2, 21 + 30 + 21 + 16 / 2,
+                        21 + 30 + 21 + 16 + 12 / 2),
+                  y = 1.15,
+                  text = top_labels,
+                  font = list(family = 'Arial', size = 12,
+                              color = 'rgb(67, 67, 67)'),
+                  showarrow = FALSE)
+fig
+```
+
+
 ```{r finances}
-questionnaire_plot(df_processed, "e1") 
+questionnaire_plot(df_processed, "e1")
 questionnaire_plot(df_processed, "e2")
 ```
 
 ## Strach z nákazy
 ```{r}
 health <- c("z1", "z2", "z3", "z4", "z5")
+
+
+
 sapply(health, function(x){print(questionnaire_plot(df_processed, x))})
 ```
 
@@ -110,8 +257,8 @@ sapply(health, function(x){print(questionnaire_plot(df_processed, x))})
 ```{r}
 cinnost_plot <- function(df_data, cinnost){
   plt <- df_data %>%
-  filter(!is.na({{cinnost}})) %>%
-  mutate(val = ifelse({{cinnost}} == 1, "ano", "ne")) %>%
+  filter(!is.na(df_data[[cinnost]])) %>%
+  mutate(val = ifelse(.[[cinnost]] == 1, "ano", "ne")) %>%
   count(val) %>%
   mutate(prop = n / sum(n),
          ypos = cumsum(prop)- 0.5*prop,
@@ -124,46 +271,139 @@ cinnost_plot <- function(df_data, cinnost){
     theme(legend.position="none")
   return(plt)
 }
-
-```
-
-```{r}
-cinnost_plot(df_processed, "cin2")
-
-df_processed$cin1 == 1
-cinnost <- "cin2"
-
-df_processed %>%
-  filter(!is.na(df_processed[[cinnost]])) %>% 
-  mutate(val = ifelse(df_processed[[cinnost]] == 1, "ano", "ne")) %>%
-  count(val)
-
-df_processed %>%
-  filter(!is.na(cin1)) %>%
-  mutate(val = ifelse(cin1 == 1, "ano", "ne")) %>%
+cinnost_plot <- function(df_data, cinnost){
+  fig <- df_data %>%
+    filter(!is.na(df_data[[cinnost]])) %>%
+    mutate(val = ifelse(.[[cinnost]] == 1, "ano", "ne")) %>%
+    count(val) %>%
+    mutate(prop = n / sum(n),
+           ypos = cumsum(prop)- 0.5*prop,
+           lab = paste0(val,"\n(",label_percent(accuracy = 1)(prop), ")")) %>%
+    plot_ly(., labels = ~val, values = ~n, type = 'pie',
+            textposition = 'inside',
+            textinfo = 'label+percent',
+            marker = list(colors = COLORS)) %>% 
+  layout(title = list(text = ~get_question_text(cinnost), 
+                      yanchor="top", xanchor="center",
+                      x = 0.3, y = 1),
+         showlegend = FALSE)
+  return(fig)
+}
+df_data <- df_processed
+cinnost <- "cin1"
+df_data %>%
+  filter(!is.na(df_data[[cinnost]])) %>%
+  mutate(val = ifelse(.[[cinnost]] == 1, "ano", "ne")) %>%
   count(val) %>%
   mutate(prop = n / sum(n),
          ypos = cumsum(prop)- 0.5*prop,
          lab = paste0(val,"\n(",label_percent(accuracy = 1)(prop), ")")) %>%
-  ggplot(aes(x="", y=prop, fill=val)) +
-    geom_bar(stat="identity") +
-    geom_text(aes(y = ypos, x = 1, label = lab), color = "white", size=6) +
-    coord_polar("y", start=0) +
-    theme_void() + 
-    theme(legend.position="none")
+  plot_ly(., labels = ~val, values = ~n, type = 'pie',
+          textposition = 'inside',
+          textinfo = 'label+percent',
+          marker = list(colors = COLORS)) %>% 
+  layout(title = list(text = ~get_question_text(cinnost), 
+                      yanchor="top", xanchor="center",
+                      x = 0.3, y = 1),
+         showlegend = FALSE)
+```
+
+```{r}
+cinnost_plot(df_processed, "cin1")
 ```
 
 ## Obavy
 
-## sekce zdraví
 
+## LCIS
+```{r}
+lcis_codes <- colnames(df_processed)[grep("lcis\\d+$", colnames(df_processed))]
+lcis_vals <- str_c(lcis_codes, "_s_computedkol")
+
+df_lcis <- df_processed %>%
+  select(ident, lcis_vals) %>%
+  rename_with(~lcis_codes, .cols = starts_with("lcis")) %>%
+  pivot_longer(-ident) %>%
+  group_by(name) %>%
+  count(happened = value > 0) %>%
+  filter(!is.na(happened)) %>%
+  pivot_wider(names_from = happened, values_from = n) %>%
+  mutate(ratio = `TRUE`/sum(`TRUE`, `FALSE`)) %>%
+  arrange(ratio) %>%
+  mutate(percent = percent(ratio, accuracy = 0.01, decimal.mark = ","),
+         name = get_question_text(name))
+
+df_lcis %>%
+  select("Otázka" = name, "Procento lidí, kteří odpověděli ano" = percent) %>%
+  knitr::kable()
+
+fig <- plot_ly(df_lcis, x = ~ratio, y = ~reorder(name, ratio), name = "",
+               type = "bar", orientation = "h", width = 0.5,
+        marker = list(color = COLORS[1],
+                      line = list(color = 'rgb(248, 248, 249)', width = 1)))
+fig <- fig %>% add_trace(x = ~(1-ratio), marker = list(color = COLORS[3]))
+
+fig %>% layout(
+  height = 8, width= 5, autosize=FALSE,
+  xaxis = list(title = "",
+                      showgrid = FALSE,
+                      showline = FALSE,
+                      tickformat = "1%",
+                      zeroline = FALSE,
+                      domain = c(0.15, 1)),
+         yaxis = list(title = "",
+                      showgrid = FALSE,
+                      showline = FALSE,
+                      zeroline = FALSE),
+         barmode = 'stack',
+         paper_bgcolor = COLORS[4], plot_bgcolor = COLORS[4],
+         margin = list(l = 250, r = 10, t = 20, b = 20),
+         showlegend = FALSE)
+```
 ## Panas
+
+```{r}
+df_processed %>%
+  plot_ly(., x=~panas_s_hedonic, type="histogram", histnorm="probability",
+          xbins=list(size=0.5), colors = COLORS[2]) %>%
+  layout(shapes = list(type='line', x0= 0, x1= 0, y0=0, y1=0.3),
+         title = list(text = "Distribuce emoční nálady", font = list(size=24)),
+          xaxis = list(title = "",
+                      showgrid = FALSE,
+                      showline = FALSE,
+                      zeroline = FALSE),
+         yaxis = list(title = "",
+                      showgrid = FALSE,
+                      showline = FALSE,
+                      tickformat = "1%",
+                      zeroline = FALSE),
+         barmode = 'stack',
+         paper_bgcolor = COLORS[4], plot_bgcolor = COLORS[4],
+         margin = list(t=50),
+         showlegend = FALSE)
+```
 
 ## Rozdělit dle doby? měsíce?
 
 ## stress a zvbládání
 
-## LCIS - události
-pohřeb, úmrtí
 
+## Swls
+
+```{r}
+df_processed %>%
+  mutate(spokojenost = cut(.$swls_s_satifaction, breaks = c(0,3.1,4.9,7),
+                          labels = c("Nespokojený", "Něco mezi", "Spokojený"))) %>%
+  filter(!is.na(spokojenost)) %>%
+  count(spokojenost) %>%
+  mutate(ratio = n/sum(n),
+         percent = percent(n/sum(n), accuracy=0.01)) %>%
+  plot_ly(., labels = ~spokojenost, values = ~n, type = 'pie',
+          textposition = 'inside',
+          textinfo = 'label+percent',
+          marker=list(colors=COLORS)) %>%
+  layout(title = list(text = "Aktuální spokojenost se životem" , yanchor="auto", xanchor="center",
+                      x = 0.4, y = 1.1),
+         showlegend = FALSE)
+```
 
