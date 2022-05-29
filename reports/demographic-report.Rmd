@@ -68,6 +68,25 @@ plt_pie_chart <- function(df_data, variable, title){
   return(fig)
 }
 
+# Requires column name and column N
+plt_bar_ratio <- function(df_data, title){
+  plt <- df_data %>%
+    mutate(ratio = n/sum(n)) %>%
+    plot_ly(., x = ~name, y = ~ratio, color = ~name, 
+          type = 'bar', colors = COLORS) %>%
+  layout(
+    title = list(text=title, x = 0.1),
+    showlegend = FALSE,
+    yaxis=list(tickformat="1%",
+                    title=""),
+         xaxis=list(title=""),
+         barmode = 'stack',
+         paper_bgcolor = BG_COLOR, plot_bgcolor = BG_COLOR,
+         margin = list(t=50)
+         )
+  return(plt)
+}
+
 create_stacked_bar <- function(df_data, selected_vars, width = 600, height = 200,
                                title = ""){
   data <- df_data %>%
@@ -190,6 +209,43 @@ df_processed %>%
   knitr::kable()
 ```
 
+```{r }
+df_processed %>%
+  filter(!is.na(zamest)) %>%
+  summarise("Má stálé zaměstnání" = grepl("1", zamest),
+            "Podníká, OSVČ" = grepl("2", zamest),
+            "Nemá stálou práci" = grepl("3", zamest),
+            "Na mateřské, v důchodu" = grepl("4", zamest)
+            ) %>%
+  pivot_longer(everything()) %>%
+  filter(value) %>%
+  plt_pie_chart("name", "Povolání")
+```
+
+```{r bydleni}
+## POkoje
+df_processed %>%
+  select(byd_pok) %>%
+  filter(!is.na(byd_pok)) %>%
+  mutate(byd_pok = as.numeric(byd_pok),
+         byd_cut = cut(byd_pok, breaks=c(seq(0,6), 20),
+                        labels = c(seq(1,6), "7+"))) %>%
+  count(byd_cut) %>%
+  select(name = byd_cut, n) %>%
+  plt_bar_ratio("Počet pokojů (bez koupelny a kuchyně)")
+```
+
+```{r deti}
+df_processed %>%
+  select(deti_poc) %>%
+  filter(!is.na(deti_poc),
+         deti_poc > 0) %>%
+  mutate(deti_poc = cut(deti_poc, breaks=c(seq(0,4), 20),
+                        labels = c(seq(1,4), "5+"))) %>%
+  count(deti_poc) %>%
+  select(name = deti_poc, n) %>%
+  plt_bar_ratio("Počet dětí")
+```
 ```{r marital status}
 df_processed %>%
   select(starts_with("family_"),
@@ -215,9 +271,62 @@ df_processed %>%
          paper_bgcolor = BG_COLOR, plot_bgcolor = BG_COLOR,
           margin = list(t=50)
          )
-           
+# Add pie chart
+df_processed %>%
+  select(starts_with("family_"),
+         -family_s_total) %>%
+  pivot_longer(everything()) %>%
+  mutate(value = factor(value, c(1,0), labels = c("Ano", "Ne")),
+         name = recode(name, "family_divorced" = "Rozvedený/á",
+                       "family_married" = "Ženatý/á",
+                       "family_relationship" = "Dlouhodobý vztah",
+                       "family_single" = "Svobodný/á",
+                       "family_widowed" = "Ovdovělý/á")) %>%
+  filter(value == "Ano") %>%
+  plt_pie_chart("name", "Rodiný stav")
 ```
+## Hodinová dedikace
+```{r}
+df_time_dedication <- df_processed %>%
+  select(da1, da2, da3, da4) %>%
+  mutate(time_sum = da1 + da2 + da3 + da4,
+         week_ratio = time_sum/(24*7)) %>%
+  mutate(across(starts_with("da"), ~.x/time_sum, .names="{.col}_ratio")) %>%
+  mutate(across(matches("da\\d$"), ~cut(.x, c(seq(0,60,5), 1000),
+                                        labels=c(seq(5,60,5), "61+")),
+                .names="{.col}_cut"))
 
+df_time_dedication %>%
+  plot_ly(data=., x=~week_ratio, type="histogram", histnorm="probability")
+
+df_time_dedication %>%
+  select(matches("da\\d_ratio")) %>%
+  pivot_longer(everything()) %>%
+  filter(!is.na(value)) %>%
+  ggplot(aes(value)) +
+    geom_histogram() +
+    facet_wrap(~name)
+
+df_time_dedication %>%
+  count(da1_cut) %>%
+  select(name = da1_cut, n) %>%
+  plt_bar_ratio("Počet hodin týdně v práci nebo prací za finanční odměnu")
+
+df_time_dedication %>%
+  count(da2_cut) %>%
+  select(name = da2_cut, n) %>%
+  plt_bar_ratio("Počet hodin týdně věnovaný péči o druhé (děti, rodiče, příbuzné)")
+
+df_time_dedication %>%
+  count(da3_cut) %>%
+  select(name = da3_cut, n) %>%
+  plt_bar_ratio("Počet hodin týdně věnovaný péči o majetek a domácnost")
+
+df_time_dedication %>%
+  count(da4_cut) %>%
+  select(name = da4_cut, n) %>%
+  plt_bar_ratio("Počet hodin týdně věnovaný péči o sebe a své záliby")
+```
 ## Finanční situace
 ```{r}
 questionnaire_plot <- function(data, question){
@@ -256,8 +365,8 @@ questionnaire_plot <- function(data, question){
 
 ```{r}
 create_stacked_bar(df_processed, "z1", 1200, 300, "Zhodnocení zdravotního stavu")
-create_stacked_bar(df_processed, c("z2", "z3", "z4"), 1000, 400, "Frekvence zdravotních komplikací")
-create_stacked_bar(df_processed, "z5", 1000, 300, "Zdravotní srovnání")
+create_stacked_bar(df_processed, c("z2", "z3", "z4"), 1200, 400, "Frekvence zdravotních komplikací")
+create_stacked_bar(df_processed, "z5", 1200, 300, "Zdravotní srovnání")
 ```
 
 
@@ -347,7 +456,6 @@ plt_percent_bar <- function(df_data, values, codes, title){
     
   return(list(table = df_question, plot = fig))
 }
-
 ```
 
 ```{r}
@@ -404,8 +512,7 @@ df_processed %>%
           textposition = 'inside',
           textinfo = 'label+percent',
           marker=list(colors=COLORS)) %>%
-  layout(title = list(text = "Aktuální spokojenost se životem" , yanchor="auto", xanchor="center",
-                      x = 0.4, y = 1.1),
+  layout(title = list(text = "Aktuální spokojenost se životem" , yanchor="auto", xanchor="center", x = 0.4, y = 1.1),
          showlegend = FALSE)
 ```
 
