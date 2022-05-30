@@ -1,5 +1,5 @@
 ---
-title: "Demographics reports"
+title: "Demografický report midlife"
 output: html_document
 ---
 
@@ -27,7 +27,6 @@ df_processed <- df_processed %>%
          vek > 40)
 ```
 
-## Demografie
 ```{r demo functions, echo=FALSE}
 plt_histogram <- function(df_data, variable, binsize, title){
   plt <- df_data %>%
@@ -188,11 +187,10 @@ create_stacked_bar <- function(df_data, selected_vars, width = 600, height = 200
 plt_histogram(df_processed, vek, 5, "Distribuce věkových skupin")
 ```
 
-?? remove Other? Only `r nrow(filter(df_processed, pohl=="O"))` observations.
 ```{r plot gender}
 df_processed %>%
   filter(pohl != "O") %>%
-  mutate(gender = recode(pohl, "M" = "muž", "F" = "žena")) %>%
+  mutate(gender = recode(pohl, "M" = "Muž", "F" = "Žena")) %>%
   plt_pie_chart("gender", "Pohlaví")
 ```
 
@@ -201,7 +199,9 @@ df_processed %>%
   filter(!is.na(vzdel)) %>%
   mutate(vzdel = recode(vzdel, "elementary" = "základní škola", "high school" = "Střední škola", "university" = "Vysoká škola")) %>%
   plt_pie_chart("vzdel", "Vzdělání")
+```
 
+```{r, eval = FALSE}
 df_processed %>%
   group_by(vzdel) %>%
   summarise(absolute = n(),
@@ -295,7 +295,9 @@ df_time_dedication <- df_processed %>%
   mutate(across(matches("da\\d$"), ~cut(.x, c(seq(0,60,5), 1000),
                                         labels=c(seq(5,60,5), "61+")),
                 .names="{.col}_cut"))
+```
 
+```{r eval = FALSE}
 df_time_dedication %>%
   plot_ly(data=., x=~week_ratio, type="histogram", histnorm="probability")
 
@@ -306,7 +308,9 @@ df_time_dedication %>%
   ggplot(aes(value)) +
     geom_histogram() +
     facet_wrap(~name)
+```
 
+```{r}
 df_time_dedication %>%
   count(da1_cut) %>%
   select(name = da1_cut, n) %>%
