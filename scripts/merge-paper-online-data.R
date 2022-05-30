@@ -115,7 +115,7 @@ df_online <- df_online %>%
 # Activities ---------
 # Activities are coded as 0 1 in paper, but 1 or 2 in online
 df_online <- df_online %>%
-  mutate(across(starts_with("cin"), ~.x - 1))
+  mutate(across(matches("cin\\d+"), ~(abs(.x - 2))))
 
 # Source -----------
 df_paper <- mutate(df_paper, source = "paper")
