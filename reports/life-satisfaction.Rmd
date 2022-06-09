@@ -5,42 +5,62 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = '../')
 library(tidyverse)
 library(here)
 library(psych)
+source(here("functions/questions.R"))
+source(here("functions/process.R"))
+source(here("functions/loading.R"))
+source(here("reports/functions/loading.R"))
 library(correlation)
 ```
 
 ```{r loading}
-source(here("functions/questions.R"))
-source(here("functions/process.R"))
-source(here("functions/loading.R"))
 df_question_categories <- read.table(here("data/processed/question-categories.csv"),
                                      sep=";", header=TRUE)
-df_processed <- load_processed()
+df_processed <- load_report_data(language="czech")
+
+# Takes ls column in a pivoted table
+create_df_ls <- function(df_processed){
+  df_ls <- df_processed %>%
+    filter(!is.na(ident)) %>%
+    select(ident, starts_with("LS"), vek) %>%
+    pivot_longer(-c(ident, vek)) %>%
+    mutate(name = str_replace(name, "ls85", "ls85_99"),
+           name = str_remove(name, "ls")) %>%
+    separate(name, c("ls_min", "ls_max"), "_", convert = TRUE, remove = FALSE) %>%
+    mutate(ls_dist = (vek - ls_max),
+           ls_state = cut(ls_dist, c(-Inf, -4, 4, Inf),
+                          labels = c("future", "present", "past")))
+  return(df_ls)
+}
 ```
 
 ```{r}
-df_processed %>%
+df_ls <- df_processed %>%
   filter(!is.na(ident)) %>%
-  select(ident, starts_with("LS")) %>%
-  pivot_longer(-ident) %>%
-  ggplot(aes(name, value, color=ident, group=ident)) +
-    geom_line() + geom_point() +
-    guides(color="none")
+  select(ident, starts_with("LS"), vek)
+
+df_ls_enhanced <- create_df_ls(df_processed)
 ```
 
 ```{r}
-df_processed %>%
-  filter(!is.na(ident)) %>%
-  select(ident, starts_with("LS")) %>%
-  pivot_longer(-ident) %>%
-  ggplot(aes(name, value)) + geom_boxplot() +
-    geom_jitter(width = 0.2, alpha = 0.1)
+df_ls_enhanced %>%
+  ggplot(aes(name, value)) +
+    geom_boxplot() 
+```
 
+```{r}
+df_ls_enhanced %>%
+  ggplot(aes(vek, value)) +
+    geom_point() + geom_smooth() + facet_wrap(~name)
+```
 
-
+```{r}
+df_ls_enhanced %>%
+  ggplot(aes(ls_state, value)) +
+    geom_boxplot() +
+    geom_jitter(width = 0.1)
 ```
 
 ```{r}

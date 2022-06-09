@@ -1,5 +1,7 @@
 ---
-title: "identity-and-age"
+title: "age-needs"
+author: "Lukáš Hejtmánek"
+date: '2022-06-09'
 output: html_document
 ---
 
@@ -22,4 +24,8 @@ df_processed <- load_processed() %>%
   filter(!is.na(ended),
          vek > 35) %>%
   filter(language == "czech")
+```
+
+```{r}
+
 ```

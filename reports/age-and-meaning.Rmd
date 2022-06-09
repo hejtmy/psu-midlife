@@ -15,6 +15,7 @@ source(here("functions/loading.R"))
 library(GGally)
 library(psych)
 library(correlation)
+library(performance)
 ```
 
 ```{r}
@@ -45,6 +46,7 @@ df_processed %>%
 glm_mlqsearch_pohl_vek <- glm(mlq_s_search ~ vek * pohl, 
                                data = filter(df_processed, pohl != "O"))
 summary(glm_mlqsearch_pohl_vek)
+#check_model(glm_mlqsearch_pohl_vek)
 ```
 
 ```{r}
@@ -60,3 +62,4 @@ glm_mlqsearch_vzdel_vek <- glm(mlq_s_search ~ vek * vzdel,
                                data = filter(df_processed, vzdel != "elementary"))
 summary(glm_mlqsearch_vzdel_vek)
 ```
+
