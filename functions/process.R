@@ -78,7 +78,7 @@ process_panas <- function(df_all){
   return(df_all)
 }
 
-## LCIS
+## LCIS ------------
 process_lcis_kol <- function(df_all){
   LCIS_QUESTIONS <- 45
   for(i in seq_len(LCIS_QUESTIONS)){
@@ -141,14 +141,14 @@ add_missing_values <- function(df_all){
   return(df_all)
 }
 
-##FINANCIAL SITUATION
+## FINANCIAL SITUATION -------
 process_finance_scale <- function(df_all){
   df_all <- df_all %>%
     mutate(finance_s_total = e1 + e2)
   return(df_all)
 }
 
-##HEALTH SCALE -----
+## HEALTH SCALE --------
 process_health_scale <- function(df_all){
   #reversed z2, z3
   df_all <- df_all %>%
@@ -156,7 +156,7 @@ process_health_scale <- function(df_all){
   return(df_all)
 }
 
-##PARTNER SCORE ------
+## PARTNER SCORE ---------
 process_partner_scale <- function(df_all){
   #reversed p7-p12
   df_all <- df_all %>%
@@ -166,7 +166,7 @@ process_partner_scale <- function(df_all){
   return(df_all)
 }
 
-##FAMILY SCALE -----
+## FAMILY SCALE ---------
 process_family_scale <- function(df_all){
   #reversed f5-f8
   df_all <- df_all %>%
@@ -175,7 +175,7 @@ process_family_scale <- function(df_all){
   return(df_all)
 }
 
-##FRIENDS SCALE -----
+## FRIENDS SCALE ---------
 process_friends_scale <- function(df_all){
   #reversed f5-f8
   df_all <- df_all %>%
@@ -192,7 +192,7 @@ process_swls <- function(df_all){
   return(df_all)
 }
 
-##BRS -----
+## BRS ---------
 process_brs <- function(df_all){
   # reversed 2,4,6
   df_all <- df_all %>%
@@ -202,7 +202,7 @@ process_brs <- function(df_all){
   return(df_all)
 }
 
-##MEANING IN LIFE ----
+## MEANING IN LIFE --------
 process_mlq <- function(df_all){
   #reversed mlq_09
   #Presence (mlq_01 + mlq_04 + mlq_05 + mlq_06 + mlq_09rev)
@@ -213,7 +213,7 @@ process_mlq <- function(df_all){
   return(df_all)
 }
 
-##GENERAL SELF-EFFICACY -----
+## GENERAL SELF-EFFICACY -----
 process_gse_scale <- function(df_all){
   df_all <- df_all %>%
     mutate(gse_s_total = gse_01 + gse_02 + gse_03 + gse_04 + gse_05 + 
@@ -231,7 +231,7 @@ process_cesd <- function(df_all){
   return(df_all)
 }
 
-##PERCEIVED STRESS -----
+## PERCEIVED STRESS -----
 process_pss <- function(df_all){
   # reversed 4,5,7,8
   df_all <- df_all %>%
@@ -241,7 +241,7 @@ process_pss <- function(df_all){
   return(df_all)
 }
 
-##PERSONAL WELL-BEING
+## PERSONAL WELL-BEING ---------
 process_pwb <- function(df_all){
   #reversed items: # 3, 5, 10, 13,14,15,16,17,18,19, 23, 26, 27, 30,31,32, 34, 36, 39, 41
   # Autonomy: 1,7,13,19,25, 31, 37
@@ -360,7 +360,7 @@ process_zftp <- function(df_all){
   return(df_all)
 }
 
-##DIDS (IDENTITY DEVELOPMENT) -----
+## DIDS (IDENTITY DEVELOPMENT) -----
 process_dids <- function(df_all){
   df_all <- df_all %>%
     mutate(dids_s_commitment_making = dids_01 + dids_02 + dids_03 + dids_04 + dids_05,
@@ -371,7 +371,7 @@ process_dids <- function(df_all){
   return(df_all)
 }
 
-##EGO INTEGRITY
+## EGO INTEGRITY ------
 process_rheis <- function(df_all){
   #reverse coded items: 3, 6, 7, 9, 11, 12, 13, 14, 16
   df_all <- df_all %>%
