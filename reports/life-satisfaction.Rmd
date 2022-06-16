@@ -62,6 +62,7 @@ df_ls_enhanced %>%
     geom_boxplot() +
     geom_jitter(width = 0.1)
 ```
+
 ```{r}
 df_ls_enhanced %>%
   filter(ls_state == "past") %>%
@@ -69,6 +70,7 @@ df_ls_enhanced %>%
     geom_boxplot()
     geom_jitter(width = 0.1)
 ```
+
 ```{r}
 df_processed %>%
   filter(!is.na(ident), vzdel != "elementary") %>%

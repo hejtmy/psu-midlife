@@ -1,0 +1,58 @@
+---
+title: "Goals and SWLS"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(GGally)
+library(tidyverse)
+library(here)
+library(psych)
+library(correlation)
+knitr::opts_chunk$set(echo = TRUE)
+source(here("functions/questions.R"))
+source(here("functions/process.R"))
+source(here("functions/loading.R"))
+```
+
+```{r loading}
+df_question_categories <- read.table(here("data/processed/question-categories.csv"),
+                                     sep=";", header=TRUE)
+df_processed <- load_processed() %>%
+  filter(!is.na(ended))
+```
+
+```{r}
+df_brs <- select(df_processed, starts_with("brs_"))
+```
+
+```{r}
+df_brs %>%
+  select(-contains("_s_")) %>%
+  pivot_longer(everything()) %>%
+  ggplot(aes(value, group=name)) +
+    geom_histogram() +
+    facet_wrap(~name)
+```
+
+```{r}
+select(df_processed, starts_with("brs_s"), pohl) %>%
+  filter(pohl != "O") %>%
+  pivot_longer(-pohl) %>%
+  ggplot(aes(x=pohl, y=value, fill=pohl, color=pohl)) +
+    geom_boxplot() +
+    geom_jitter() + 
+    facet_wrap(~name)
+```
+```{r factor analysis}
+ggcorr(df_brs, method = c("everything", "pearson")) 
+```
+
+```{r}
+KMO(select(df_brs, -contains("_s_")))
+eigen(cor(df_brs, use = "complete.obs"))
+scree(df_brs, pc=FALSE)
+fa.parallel(select(df_brs, -contains("_s_")), fa = "fa")
+```
+```
+
