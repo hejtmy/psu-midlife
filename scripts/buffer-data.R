@@ -3,7 +3,7 @@ library(googlesheets4)
 library(tidyverse)
 source("functions/fetch-online-data.R")
 
-USE_BUFFERED <- TRUE
+USE_BUFFERED <- FALSE
 
 df_online <- fetch_data_online(USE_BUFFERED)
 df_paper <- fetch_data_paper(USE_BUFFERED)
@@ -23,6 +23,6 @@ write.table(df_all, "data/processed/all-data-raw.csv", sep=";",
 
 source("scripts/process-data.R")
 
-df_question_categories <- fetch_question_categories() 
+df_question_categories <- fetch_question_categories()
 write.table(df_question_categories, "data/processed/question-categories.csv",
             sep=";")

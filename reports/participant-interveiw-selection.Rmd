@@ -48,6 +48,7 @@ df_selection <- df_midlife %>%
   mutate(z_average = (z_identity + z_resilience + z_satisfaction)/3)
 ```
 
+
 ```{r}
 df_selection %>%
   select(-ident) %>%
@@ -55,7 +56,9 @@ df_selection %>%
   ggplot(aes(value)) + geom_histogram(binwidth = 0.1) +
   facet_wrap(~name)
 ```
+
 ## Nejlepší z nejlepších
+
 ```{r}
 df_selection %>%
   arrange(-z_average) %>%
@@ -63,11 +66,36 @@ df_selection %>%
   head(20) %>%
   knitr::kable()
 ```
+
 ## Nejhorší z nejhorších
+
 ```{r}
 df_selection %>%
   arrange(z_average) %>%
   select(ident, z_average) %>%
   head(20) %>%
+  knitr::kable()
+```
+
+# Resilience
+
+Výběř jen na základě resilience. Resilience je z Brief Resilience Scale. Skóre 0-30. Problém je, že u 23 se to trochu láme. 15 lidí má 30-24, ale 23 bodů má už 32.
+
+```{r}
+df_midlife %>%
+  ggplot(aes(brs_s_total)) + geom_histogram(binwidth = 1)
+
+df_midlife %>%
+  count(brs_s_total) %>%
+  arrange(-brs_s_total) %>%
+  mutate(cumsum = cumsum(n)) %>%
+  knitr::kable()
+```
+
+```{r}
+df_midlife %>%
+  arrange(-brs_s_total) %>%
+  select(ident, brs_s_total, vek, pohl) %>%
+  head(32)  %>%
   knitr::kable()
 ```
