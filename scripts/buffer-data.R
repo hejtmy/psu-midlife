@@ -3,7 +3,7 @@ library(googlesheets4)
 library(tidyverse)
 source("functions/fetch-online-data.R")
 
-USE_BUFFERED <- FALSE
+USE_BUFFERED <- TRUE
 
 df_online <- fetch_data_online(USE_BUFFERED)
 df_paper <- fetch_data_paper(USE_BUFFERED)
@@ -18,8 +18,8 @@ df_online <- readr::type_convert(df_online)
 source("scripts/merge-paper-online-data.R")
 
 dir.create("data/processed", showWarnings = FALSE)
-write.table(df_all, "data/processed/all-data-raw.csv", sep=";",
-            row.names = FALSE)
+write.table(df_all, "data/processed/all-data-raw.csv",
+            sep=";", row.names = FALSE)
 
 source("scripts/process-data.R")
 

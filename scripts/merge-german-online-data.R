@@ -1,8 +1,9 @@
 # This expects the xlsx file to be present
-
 df_german <- df_german %>%
+  filter(!is.na(session)) %>%
   select(-c(giveaway, interview_consent, longterm_consent,
-            charity, partner_widow_age))
+            charity, partner_widow_age)) %>%
+  mutate(ident = substr(session, 1, 5))
 
 # Adding lcis columns --------
 df_german <- df_german %>%
@@ -12,7 +13,7 @@ df_german <- df_german %>%
   add_column(lcis7_freq = NA, .after = "lcis7") %>% 
   add_column(lcis12_freq = NA, .after = "lcis12")
 
-colnames(df_german) <- colnames(select(df_online, -ident))
+colnames(df_german) <- colnames(df_online)
 
 df_german <- df_german %>%
   mutate(vek=as.character(vek),
