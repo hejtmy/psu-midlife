@@ -290,11 +290,18 @@ process_bfi2s <- function(df_all){
 ## BASIC NEEDS ------
 process_bpns <- function(df_all){
   # REVERSE CODED ITEMS: 03, 04, 07, 11, 15, 16, 18, 19, 20
+  # Autonomy: 1, 4(R), 8, 11(R), 14, 17, 20(R)
+  # Competence: 3(R), 5, 10, 13, 15(R), 19(R)
+  # Relatedness: 2, 6, 7(R), 9, 12, 16(R), 18(R), 21
+  
   df_all <- df_all %>%
     mutate(bpns_s_total = (bpns_01 + bpns_02 + reversed(bpns_03, 7) + reversed(bpns_04, 7) + bpns_05 + bpns_06 +
                        reversed(bpns_07, 7) + bpns_08 + bpns_09 + bpns_10 + reversed(bpns_11, 7) + bpns_12 +
                        bpns_13 + bpns_14 + reversed(bpns_15, 7) + reversed(bpns_16, 7) + bpns_17 +
                        reversed(bpns_18, 7) + reversed(bpns_19, 7) + reversed(bpns_20, 7) + bpns_21),
+           bpns_s_autonomy = (bpns_01 + reversed(bpns_04, 7) + bpns_08 + reversed(bpns_11, 7) + bpns_14 + bpns_17 + reversed(bpns_20, 7))/7,
+           bpns_s_competence = (reversed(bpns_03, 7) + bpns_05 + bpns_10 + bpns_13 + reversed(bpns_15, 7) + reversed(bpns_19, 7))/6,
+           bpns_s_relatedness = (bpns_02 + bpns_06 + reversed(bpns_07, 7) + bpns_09 + bpns_12 + reversed(bpns_16, 7) + reversed(bpns_18, 7) + bpns_21)/8,
            bpns_s_average = bpns_s_total / 21)
   return(df_all)
 }
