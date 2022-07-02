@@ -1,0 +1,21 @@
+## `r QUESTIONNAIRE_NAME` {.tabset}
+
+### Plot
+
+```{r }
+df_questionnaire <- get_questionnaire_summary_data(df_report, questionnaire_code)
+plot_summary_data(df_questionnaire)
+plot_summary_data(df_questionnaire, "pohl")
+```
+
+### Regression full
+
+```{r, results='asis'}
+invisible(regression_analysis(df_questionnaire, "vek"))
+```
+
+### Regression gender
+
+```{r, results='asis'}
+invisible(regression_analysis(df_questionnaire, "vek*pohl"))
+``` 

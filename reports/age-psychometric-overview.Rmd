@@ -1,0 +1,83 @@
+---
+title: "age-psychometric-overview"
+author: "Lukáš Hejtmánek"
+date: '2022-07-02'
+output: html_document
+---
+
+```{r setup, echo = FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(here)
+library(tidyverse)
+source(here("functions/questions.R"))
+source(here("functions/process.R"))
+source(here("functions/getters.R"))
+source(here("functions/loading.R"))
+source(here("reports/functions/loading.R"))
+library(GGally)
+library(broom)
+library(psych)
+library(correlation)
+library(papaja)
+```
+
+```{r loading}
+df_question_categories <- load_question_categories()
+df_report <- load_report_data(lang = "czech")
+```
+
+```{r filtering}
+df_report <- df_report %>%
+  filter(pohl != "O")
+```
+
+```{r functions}
+get_questionnaire_summary_data <- function(df_data, questionnaire){
+ df_questionnaire <- get_data_questionnaire(df_data, questionnaire, raw=FALSE) %>%
+  left_join(get_demographic_data(df_data), by = "ident") 
+ return(df_questionnaire)
+}
+
+plot_summary_data <- function(df_data, separate = NULL){
+  df_plt <- df_data %>%
+    pivot_longer(contains("_s_"))
+  if(is.null(separate)){
+    plt <- ggplot(df_plt, aes(vek, value))
+  } else {
+    plt <- ggplot(df_plt, aes_string("vek", "value", color = separate))
+  }
+  plt <- plt +
+      facet_wrap(~name) +
+      geom_point() +
+      geom_smooth(method="lm")
+  return(plt)
+}
+
+regression_analysis <- function(df_data, terms, interaction = TRUE){
+  df_analysis <- df_data %>%
+    pivot_longer(contains("_s_"))
+  formula <- reformulate(termlabels = terms, response = 'value')
+  out <- list()
+  for(scale in unique(df_analysis$name)){
+    res <- lm(formula, data = filter(df_analysis, name == scale))
+    apa_tab <- apa_table(apa_print(res)$table,
+                         caption = paste0("A model for ", scale))
+    out[[scale]] <- apa_tab
+    cat(apa_tab)
+  }
+  return(out)
+}
+```
+
+```{r results = "asis"}
+questionnaires <- c("swls", "panas", "brs", "mlq", "gse", "cesd", "pss", "pwb", "bfi2s","bpns",
+  "gbc", "goals", "lgs", "zftp", "dids", "rheis")
+for(questionnaire in questionnaires){
+  QUESTIONNAIRE_NAME <- questionnaire
+  questionnaire_code <- questionnaire
+  res <- knitr::knit_child(here("reports/chunks/questionnaire-section.Rmd"), quiet = TRUE)
+  cat(res, sep = '\n')
+}
+```
+
+
