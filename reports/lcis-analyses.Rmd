@@ -1,0 +1,81 @@
+---
+title: "lcis-analyses"
+author: "Lukáš Hejtmánek"
+date: '2022-07-02'
+output: html_document
+---
+```{r setup, echo = FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(here)
+library(tidyverse)
+source(here("functions/questions.R"))
+source(here("functions/process.R"))
+source(here("functions/getters.R"))
+source(here("functions/loading.R"))
+source(here("reports/functions/loading.R"))
+library(GGally)
+library(broom)
+library(psych)
+library(correlation)
+library(papaja)
+```
+
+```{r loading}
+df_question_categories <- load_question_categories()
+df_report <- load_report_data(lang = "czech")
+```
+
+```{r filtering}
+df_report <- df_report %>%
+  filter(pohl != "O")
+```
+
+```{r}
+df_lcis <- df_report %>%
+  select(ident, vek, pohl, starts_with("lcis"),
+         contains("_s_"), -contains("_kol"), -contains("_s_weight"))
+df_lcis <- df_lcis %>%
+  rowwise() %>%
+  mutate(lcis_s_weight_total = sum(across(contains("computedweig"))),
+         lcis_s_kol_total = sum(across(contains("computedkol")))) %>%
+  ungroup()
+
+```
+
+```{r}
+df_lcis %>%
+  filter(lcis_s_kol_total < 100) %>%
+  select(ident, contains("computedweig")) %>%
+  pivot_longer(-ident) %>%
+  ggplot(aes(value)) + geom_histogram()
+```
+
+```{r filtering}
+ARBITRARY_LCIS_KOL_CUTOFF <- 150
+df_lcis_filtered <- df_lcis %>%
+  filter(lcis_s_kol_total < ARBITRARY_LCIS_KOL_CUTOFF)
+```
+
+```{r}
+df_lcis_filtered %>%
+  select(ident, vek, pohl, contains("_s_"),
+         -contains("computedweig"), -contains("kol")) %>%
+  pivot_longer(-c(ident, vek, pohl, lcis_s_weight_total)) %>%
+  group_by(name) %>%
+  mutate(norm_value = scale(value)) %>%
+  ungroup() %>%
+  ggplot(aes(lcis_s_weight_total, value)) +
+    geom_point() +
+    geom_smooth(method = "lm") +
+    facet_wrap(~name, scales = "free") +
+    scale_x_continuous(trans = "log10")
+```
+
+```{r}
+df_lcis_filtered %>%
+  select(contains("_s_"),
+         -contains("computedweig"), -contains("kol")) %>%
+  correlation::correlation(select = "lcis_s_weight_total",
+                         select2 = colnames(.)[-length(colnames(.))],
+                         method = "spearman", p_adjust = "holm")
+```
