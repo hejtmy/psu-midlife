@@ -12,6 +12,7 @@ library(tidyverse)
 source(here("functions/questions.R"))
 source(here("functions/process.R"))
 source(here("functions/loading.R"))
+source(here("reports/functions/loading.R"))
 library(GGally)
 library(psych)
 library(correlation)
@@ -21,10 +22,7 @@ library(performance)
 ```{r}
 df_question_categories <- read.table(here("data/processed/question-categories.csv"),
                                      sep=";", header=TRUE)
-df_processed <- load_processed() %>%
-  filter(!is.na(ended),
-         vek > 35) %>%
-  filter(language == "czech")
+df_processed <- load_report_data(lang="czech")
 ```
 
 
