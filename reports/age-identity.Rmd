@@ -9,8 +9,10 @@ library(here)
 library(tidyverse)
 source(here("functions/questions.R"))
 source(here("functions/process.R"))
-source(here("functions/loading.R"))
+source(here("functions/getters.R"))
+source(here("reports/functions/loading.R"))
 library(GGally)
+library(broom)
 library(psych)
 library(correlation)
 ```
@@ -18,13 +20,29 @@ library(correlation)
 ```{r}
 df_question_categories <- read.table(here("data/processed/question-categories.csv"),
                                      sep=";", header=TRUE)
-df_processed <- load_processed() %>%
-  filter(!is.na(ended),
-         vek > 35) %>%
-  filter(language == "czech")
+df_report <- load_report_data(lang = "czech")
 ```
 
 ```{r}
+df_dids <- get_data_questionnaire(df_report, "dids", raw=FALSE) %>%
+  left_join(get_demographic_data(df_report), by = "ident")
+```
 
+```{r}
+df_dids %>%
+  pivot_longer(contains("_s_")) %>%
+  ggplot(aes(vek, value, color = name)) + 
+    geom_point() +
+    facet_wrap(~name) +
+    geom_smooth(method="lm")
 
+df_dids %>%
+  pivot_longer(contains("_s_")) %>%
+  nest_by(name) %>%
+  mutate(mod = list(lm(value ~ vek, data = data))) %>%
+  summarize(tidy(mod))
+
+fitted_models %>%
+  rowwise() %>%
+  tidy(model)
 ```
