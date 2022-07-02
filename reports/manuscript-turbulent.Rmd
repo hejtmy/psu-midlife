@@ -5,7 +5,32 @@ output: html_document
 ```{r}
 
 ```
-## Turbulent search for life or nothing speci?l:
+
+# Abstract
+
+In this study we present an psychological overview of a large sample of people in their midlife. We their happiness, generativity, resilience or life satisfaction and search for meaning and we challenge the view that midlife is a time of a necessary turmoil 
+
+
+# Introduction
+
+
+Generally Considered to be the time between 40 - 60 years (XXXX), midlife encompases about one fourth of human life. It is the time of career and family building, between .
+
+Despite the importance of midlife and the growing group caused by aging population, midlife is still quite unexplored part of human development (XXXX lachman 2015). 
+
+### Midlife crisis
+Midlife has also been often described through the media present midlife crisis. Although the term is very popular, most psychological studies warn that if something such as midlife crisis exists, it does not affect many people (XXXX). The origin of midlife crisis can be ascribed more to the generational and cross sectional studies (XXXX), capturing more a generational differences between boomers and XXXX (XXXX) than some universal decline in persons happiness and need to revisit world values, but even  in modern cross sectional studies there is little evidence for any happiness and satisfaction decline in this period. In contrast, midlife has been often described by increases in overall satisfaction (XXX), peaking generativity (XXX) and .
+
+There is still one problem 
+
+
+Contrary to the popular opinion, midlife has been defined by an increased resilience and overall satisfaction. 
+
+# Methods
+
+
+# Results
+
 
 ### Mlq
 there is a tendency to assume that middle life is tied to a search for meaning.
@@ -20,8 +45,19 @@ The other assumption is that midlife is somehow connected to the crisis of
 
 ```
 
+### Resilience
+
+
+### Looking at crisis as a response to death 
+
 
 # Discussion
 Given our sample, it is possible that the midlife, as it is understood in the popular culture and as it is being marketed to us is happening sooner than 40 years. By 40, people have their goals, meaning and identity sorted out nad no other significant changes and generative processes are taking place. This is in contrast to the 
+
+## Cohort problem
+One of the problems with cross sectional studies is that they do not allow for capturing of the individual turmoils which can occur during midlife. If one person goes through the afromentioned crisis in their 40s while others in 45 or 50, it naturally distributes the potential low scores in osychometric measures. In other words, our results do not disprove that people do not suffer from so called midlife crisis, they simply suggest that there is no discrete timepoint in the midlife which would 
+
+One of the potential reasons for the midlife crisis is the increasing likelyhood of significant life altering situatios whcih appear in this time period - people feel health problems and cognitive declie, there are more . While 30s are often filled with marriages, first babies being born, new jobs and opportunities arising, midlife is a time of general stability and life altering situations can be biased towards more negative one - health problems, divorce, menopause, children leaving. But 
+
 
 
