@@ -282,7 +282,7 @@ process_bfi2s <- function(df_all){
              bfi2s_13 + bfi2s_18 + bfi2s_23 + reversed(bfi2s_28, 5),
            bfi2s_s_negative_emotionality = bfi2s_04 + bfi2s_09 + reversed(bfi2s_14, 5) + 
              reversed(bfi2s_19, 5) + reversed(bfi2s_24, 5) + bfi2s_29,
-           bfi2s_open_mindedness = bfi2s_05 + reversed(bfi2s_10, 5) + bfi2s_15 + 
+           bfi2s_s_open_mindedness = bfi2s_05 + reversed(bfi2s_10, 5) + bfi2s_15 + 
              bfi2s_20 + bfi2s_25 + reversed(bfi2s_30, 5))
   return(df_all)
 }
