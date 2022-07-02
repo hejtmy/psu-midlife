@@ -22,6 +22,7 @@ df_german <- df_german %>%
   mutate_at(vars(starts_with("lcis")), ~as.character(.))
 
 df_online <- df_online %>%
+  filter(!is.na(ident)) %>%
   mutate_at(vars(starts_with("lcis")), ~as.character(.)) %>%
   mutate(vzdel_roky = as.character(vzdel_roky))
 
