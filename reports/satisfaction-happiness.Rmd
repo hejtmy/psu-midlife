@@ -14,6 +14,9 @@ source(here("functions/process.R"))
 source(here("functions/loading.R"))
 source(here("reports/functions/loading.R"))
 library(correlation)
+library(plotly)
+library(psych)
+library(ggfortify)
 ```
 
 ```{r loading}
@@ -22,8 +25,6 @@ df_report <- load_report_data(lang = "czech")
 ```
 
 ```{r}
-
-
 LS_CUTOFFS <- c(0,12,18,25,35,45,55,65,75,85,150)
 LS_LABELS <- stringr::str_c(LS_CUTOFFS[-length(LS_CUTOFFS)] + 1, LS_CUTOFFS[-1], sep = "_")
 LS_LABELS <- paste0("ls", LS_LABELS)
@@ -43,7 +44,102 @@ df_ls <- df_report %>%
 
 ```{r}
 df_report %>%
-  select(swls_s_satifaction, panas_s_positive, panas_s_positive, panas_s_hedonic,
-         ls_s_current) %>%
+  select(swls_s_satifaction, panas_s_positive, panas_s_negative, panas_s_hedonic,
+         pwb_s_total, ls_s_current, cesd_s_total) %>%
+  mutate(cesd_s_total = log(cesd_s_total)) %>%
   correlation()
+```
+
+```{r normality checking}
+df_report %>%
+  select(pwb_s_total, panas_s_hedonic, swls_s_satifaction, cesd_s_total) %>%
+  pivot_longer(everything()) %>%
+  ggplot(aes(value)) +
+    geom_histogram() +
+    facet_wrap(~name, scales = "free")
+
+ggplot(df_report, aes(cesd_s_total)) +
+  geom_histogram(bins = 15) +
+  scale_x_log10()
+```
+
+```{r visualize all scores together}
+lm_happiness <- lm(pwb_s_total ~ 1 + panas_s_hedonic + swls_s_satifaction,
+                   data = df_report)
+plane_resolution <- 0.1
+axis_x <- seq(min(df_report$swls_s_satifaction, na.rm = TRUE),
+              max(df_report$swls_s_satifaction, na.rm = TRUE),
+              by = plane_resolution)
+axis_y <- seq(min(df_report$panas_s_hedonic, na.rm = TRUE),
+              max(df_report$panas_s_hedonic, na.rm = TRUE),
+              by = plane_resolution)
+df_surface <- expand.grid(swls_s_satifaction = axis_x, panas_s_hedonic = axis_y,
+                          KEEP.OUT.ATTRS = FALSE)
+df_surface$pwb_s_total <- predict.lm(lm_happiness, newdata = df_surface)
+surface <- pivot_wider(df_surface, 
+            id_cols = panas_s_hedonic,
+            names_from = swls_s_satifaction,
+            values_from = pwb_s_total) %>%
+  column_to_rownames(var="panas_s_hedonic")%>%
+  as.matrix()
+
+plot_ly(df_report, x=~swls_s_satifaction, y=~panas_s_hedonic, z =~pwb_s_total, 
+        color=~cesd_s_total) %>%
+  add_markers() %>%
+  add_trace(x = axis_x, y=axis_y, z= surface,
+            color = "black",
+            type="surface")
+```
+
+## Individual items and factor analysis
+
+```{r}
+df_happiness_items <- df_report %>%
+  select(starts_with("swls"), starts_with("panas"),
+         -contains("_s_"), ls_s_current)
+KMO(df_happiness_items)
+scree(df_happiness_items, pc=FALSE)
+fa.parallel(df_happiness_items, fa = "fa")
+```
+
+```{r}
+fit <- factanal(df_happiness_items[complete.cases(df_happiness_items),], 4, rotation="promax")
+print(fit, digits=2, cutoff=0.3, sort=TRUE)
+```
+
+It just creates factors of the individual scales. So it seems they do really represent something slightly different in the psychometric space.
+
+## Total scores PCA
+
+```{r}
+df_happiness_scores <- df_report %>%
+  select(swls_s_satifaction, panas_s_negative, panas_s_positive, cesd_s_total, starts_with("pwb_s"), -pwb_s_total) %>%
+  mutate(across(everything(), ~replace_na(.x, median(.x, na.rm = TRUE))))
+
+pca_happiness <- prcomp(df_happiness_scores[complete.cases(df_happiness_scores),],
+                        center = TRUE,scale. = TRUE)
+summary(pca_happiness) 
+pca_happiness
+```
+
+```{r}
+autoplot(pca_happiness)
+biplot(pca_happiness)
+```
+```{r}
+plot_ly(df_report, x=~swls_s_satifaction, y=~panas_s_hedonic, z =~pwb_s_total, 
+        color=pca_happiness$x[,1]) %>%
+  add_markers()
+```
+
+```{r}
+plot_ly(df_report, x=~swls_s_satifaction, y=~panas_s_hedonic, z =~pwb_s_total, 
+        color=pca_happiness$x[,1]) %>%
+  add_markers()
+```
+
+## Total scores factor
+
+```{r}
+
 ```
