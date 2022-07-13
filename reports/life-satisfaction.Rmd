@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Life satisfaction and age"
 output: html_document
 ---
 
@@ -55,6 +55,7 @@ df_ls_enhanced %>%
   ggplot(aes(vek, value)) +
     geom_point() + geom_smooth() + facet_wrap(~name)
 ```
+
 
 ```{r}
 df_ls_enhanced %>%

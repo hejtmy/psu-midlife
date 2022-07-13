@@ -1,2 +1,4 @@
-trackdown::upload_file("reports/manuscript-turbulent.Rmd",
-                       gpath = "PSU/projects/midlife/manuscript")
+local_file <- "reports/manuscript-turbulent.Rmd"
+g_file <- "PSU/projects/midlife/manuscript"
+trackdown::update_file(local_file, gpath = g_file)
+trackdown::download_file(local_file, gpath = g_file)
