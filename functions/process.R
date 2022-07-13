@@ -262,7 +262,9 @@ process_pwb <- function(df_all){
            pwb_s_purpose_in_life = reversed(pwb_05, 6) + pwb_11 + reversed(pwb_17, 6) + reversed(pwb_23, 6) +
              pwb_29 + pwb_35 + reversed(pwb_41, 6),
            pwb_s_self_acceptance = pwb_06 + pwb_12 + reversed(pwb_18, 6) + pwb_24 + reversed(pwb_30, 6) +
-             reversed(pwb_36, 6) + pwb_42)
+             reversed(pwb_36, 6) + pwb_42,
+           pwb_s_total = pwb_s_autonomy + pwb_s_environmental_mastery + pwb_s_personal_growth +
+             pwb_s_positive_relations + pwb_s_purpose_in_life + pwb_s_self_acceptance)
   return(df_all)
 }
 
