@@ -44,6 +44,7 @@ select(df_processed, starts_with("brs_s"), pohl) %>%
     geom_jitter() + 
     facet_wrap(~name)
 ```
+
 ```{r factor analysis}
 ggcorr(df_brs, method = c("everything", "pearson")) 
 ```

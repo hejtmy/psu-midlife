@@ -1,0 +1,65 @@
+---
+title: "Goals and SWLS"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(GGally)
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+source(here("functions/questions.R"))
+source(here("functions/process.R"))
+source(here("functions/loading.R"))
+```
+
+```{r loading}
+df_question_categories <- load_question_categories()
+  
+df_analysis <- load_processed() %>%
+  filter(!is.na(ended),
+         language == "czech")
+```
+
+```{r factor analysis}
+df_pwb <- select(df_analysis, starts_with("pwb_s"))
+df_pwb_items <- select(df_analysis, get_question_codes("pwb", df_analysis))
+ggcorr(df_pwb_items, method = c("everything", "pearson")) 
+```
+
+```{r}
+KMO(df_pwb_items)
+eigen(cor(df_pwb, use = "complete.obs"))
+scree(df_pwb_items, pc=FALSE)
+fa.parallel(df_pwb_items, fa="fa")
+```
+
+```{r}
+fit <- factanal(df_pwb_items[complete.cases(df_pwb_items),], 6, rotation="promax")
+fit <- fa(df_pwb_items, nfactors=6, rotate="varimax")
+print(fit, digits=2, cutoff=0.3, sort=TRUE)
+```
+
+```{r diagram ,fig.height=8, fig.width=6}
+loads <- fit$loadings
+fa.diagram(loads)
+```
+
+## Total score
+
+```{r}
+correlation(df_pwb)
+ggcorr(df_pwb, method = c("everything", "pearson"), limits = c(0,1),low = "#000000",
+       mid = "#0000FF", nbreaks = 20)
+```
+
+```{r}
+df_pwb <- df_pwb %>%
+  rowwise() %>%
+  mutate(pwb_s_total = sum(c_across(everything()), na.rm = TRUE)) %>%
+  ungroup()
+correlation(df_pwb)
+```
+
+```{r}
+summary(prcomp(df_pwb))
+```
