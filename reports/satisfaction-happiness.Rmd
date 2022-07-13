@@ -1,0 +1,49 @@
+---
+title: "Satisfaction-and-happiness"
+author: "Lukáš 'hejtmy' Hejtmánek"
+date: "7/12/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+source(here("functions/questions.R"))
+source(here("functions/process.R"))
+source(here("functions/loading.R"))
+source(here("reports/functions/loading.R"))
+library(correlation)
+```
+
+```{r loading}
+df_question_categories <- load_question_categories()
+df_report <- load_report_data(lang = "czech")
+```
+
+```{r}
+
+
+LS_CUTOFFS <- c(0,12,18,25,35,45,55,65,75,85,150)
+LS_LABELS <- stringr::str_c(LS_CUTOFFS[-length(LS_CUTOFFS)] + 1, LS_CUTOFFS[-1], sep = "_")
+LS_LABELS <- paste0("ls", LS_LABELS)
+LS_LABELS[1] <- "ls0_12"
+LS_LABELS[length(LS_LABELS)] <- "ls85"
+df_report <- df_report %>%
+  mutate(ls_s_category = cut(df_report$vek, LS_CUTOFFS, LS_LABELS)) %>%
+  rowwise() %>%
+  mutate(ls_s_current = c_across(as.character(ls_s_category))) %>%
+  ungroup()
+
+df_ls <- df_report %>%
+  filter(!is.na(ident)) %>%
+  select(ident, starts_with("ls"), vek)
+```
+
+
+```{r}
+df_report %>%
+  select(swls_s_satifaction, panas_s_positive, panas_s_positive, panas_s_hedonic,
+         ls_s_current) %>%
+  correlation()
+```
