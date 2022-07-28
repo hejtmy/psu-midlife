@@ -41,7 +41,6 @@ df_ls <- df_report %>%
   select(ident, starts_with("ls"), vek)
 ```
 
-
 ```{r}
 df_report %>%
   select(swls_s_satifaction, panas_s_positive, panas_s_negative, panas_s_hedonic,
@@ -96,7 +95,7 @@ plot_ly(df_report, x=~swls_s_satifaction, y=~panas_s_hedonic, z =~pwb_s_total,
 ```{r}
 df_happiness_items <- df_report %>%
   select(starts_with("swls"), starts_with("panas"),
-         -contains("_s_"), ls_s_current)
+         starts_with("pwb"), -contains("_s_"), ls_s_current)
 KMO(df_happiness_items)
 scree(df_happiness_items, pc=FALSE)
 fa.parallel(df_happiness_items, fa = "fa")
@@ -113,7 +112,8 @@ It just creates factors of the individual scales. So it seems they do really rep
 
 ```{r}
 df_happiness_scores <- df_report %>%
-  select(swls_s_satifaction, panas_s_negative, panas_s_positive, cesd_s_total, starts_with("pwb_s"), -pwb_s_total) %>%
+  select(swls_s_satifaction, panas_s_negative, 
+         panas_s_positive, cesd_s_total, starts_with("pwb_s"), -pwb_s_total) %>%
   mutate(across(everything(), ~replace_na(.x, median(.x, na.rm = TRUE))))
 
 pca_happiness <- prcomp(df_happiness_scores[complete.cases(df_happiness_scores),],
@@ -126,6 +126,7 @@ pca_happiness
 autoplot(pca_happiness)
 biplot(pca_happiness)
 ```
+
 ```{r}
 plot_ly(df_report, x=~swls_s_satifaction, y=~panas_s_hedonic, z =~pwb_s_total, 
         color=pca_happiness$x[,1]) %>%
