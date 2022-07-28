@@ -92,7 +92,7 @@ load_questions <- function(){
 #'
 #' @examples
 get_question_codes <- function(questionnaire, df_data){
-  cols <- select(df_data, starts_with(questionnaire), -contains("_s_"),
+  cols <- select(df_data, matches(questionnaire), -contains("_s_"),
                  -ends_with("_cont")) %>%
     colnames(.)
   return(cols)

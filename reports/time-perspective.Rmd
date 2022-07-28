@@ -1,0 +1,30 @@
+---
+title: "Time perspective"
+author: "Lukáš Hejtmánek"
+date: '2022-07-28'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(tidyverse)
+source(here("reports/functions/create-life-happiness-score.R"))
+```
+
+```{r, loading}
+df_question_categories <- load_question_categories()
+df_report <- load_report_data(lang = "czech") %>%
+  filter(vek > 40, pohl != "O") %>%
+  add_happiness_pca()
+```
+
+```{r}
+df_report %>%
+  select(starts_with("zftp_s"), pca_happiness, vek, pohl) %>%
+  pivot_longer(-c(vek, pohl, pca_happiness)) %>%
+  ggplot(aes(value, pca_happiness)) + 
+  facet_wrap(~name) + 
+  geom_point() + 
+  geom_smooth(method = "lm")
+```

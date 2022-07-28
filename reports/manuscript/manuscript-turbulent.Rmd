@@ -1,0 +1,155 @@
+---
+title: "manuscript-turbulence"
+output: html_document
+---
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(tidyverse)
+library(patchwork)
+source(here("functions/questions.R"))
+source(here("functions/process.R"))
+source(here("functions/loading.R"))
+source(here("reports/functions/loading.R"))
+source(here("reports/functions/create-life-happiness-score.R"))
+```
+
+```{r, loading}
+df_question_categories <- load_question_categories()
+df_report <- load_report_data(lang = "czech")
+```
+
+# Abstract
+
+In this study we present an psychological overview of a large sample of people in their midlife. We their happiness, generativity, resilience or life satisfaction and search for meaning and we challenge the view that midlife is a time of a necessary turmoil 
+
+# Introduction
+
+During the first meetings between the protagonists of the movie Lost in Translation, Scarlett Johanson states to Bill Murray “You are probably just having a midlife crisis. Did you buy a Porsche yet?”. The movie can be considered to be a depiction of a clasical example of midlife crisis. Bill Murray’s character is [a]having marital problems, he questions his career and life choices, throughout the movie he flirts with a woman about half his age and starts to find enjoyment in the young people and in the unfamiliar, almost alien environment of Japan. Midlife crisis is a staple in the media and advertising, trying to define the midlife through a necessary reevaluation of one's life and his last opportunity to change it. 
+
+Generally considered to be the time between 40 - 60 years (XXXX), midlife encompases about one fourth of human life. It is the time of career and family building, time between the naive and energetic youth and “stáří”. 
+
+Despite the importance of midlife and the growing group caused by aging population, midlife is still quite unexplored part of human development (XXXX lachman 2015). 
+
+### Midlife crisis
+Midlife has also been often described through the media present midlife crisis. Although the term is very popular, most psychological studies warn that if something such as a midlife crisis exists, it does not affect many people (XXXX). The origin of midlife crisis can be ascribed more to the generational and cross sectional studies (XXXX), capturing more a generational differences between boomers and XXXX (XXXX) than some universal decline in persons happiness and need to revisit world values, but even  in modern cross sectional studies there is little evidence for any happiness and satisfaction decline in this period. In contrast, midlife has been often described by increases in overall satisfaction (XXX), peaking generativity (XXX) and .
+
+There can also be a problem with the public definition of midlife itself. When asked if they have had midlife crises, about 10-20 percent of Americans under 40 said they have already had it (Wethington 2000), somewhat redefining the young adulthood as midlife. There is also much broader definition of the term crisis. What some people consider to be just a time of change, others might consider crisis and others consider the term to be nothing more than and excuse for not growing up or taking the responsibility in one’s life (Wethington 2000).
+
+Contrary to the popular opinion, midlife has been defined by an increased resilience and overall satisfaction. 
+
+# Methods
+
+## Participants
+```{r}
+df_report <- df_report %>%
+  filter(vek > 40,
+         pohl != "O")
+```
+
+## PCA decomposision
+It is challenging to select a single one metric of person's happiness. We have administered a multitude of psychometric tools to asses one's satisfaction with life and overall emotional state (e.g. SWLS, PANAS, CES, PWB). SElection of any single one of these tools could not demonstrate the full width of potential level of felt happiness, while using all of them in separate analyses would blow out th number of comparisons and risk a type I error. For this reason, we settled on reducing the main psychometric scales to a single feature representing using Principal component analysis. 
+
+We entered the SWLS total score, PANAS hedonic score, CES total score and PWB total scores. The resulting XXXX
+
+```{r adding pca}
+df_report <- add_happiness_pca(df_report)
+```
+
+# Results
+```{r}
+lockBinding("df_report", globalenv())
+```
+
+## Shape of happinness
+
+```{r}
+df_report %>%
+  ggplot(aes(vek, pca_happiness)) +
+    geom_point() +
+    geom_smooth()
+```
+
+### Mlq
+there is a tendency to assume that middle life is tied to a search for meaning.
+
+```{r}
+
+```
+
+## Identity crisis
+The other assumption is that midlife is somehow connected to the crisis of 
+```{r}
+
+```
+
+### Resilience
+
+```{r}
+
+```
+
+## Socioeconomic stituation and life events
+
+### Family and friends
+```{r plot family}
+plt_vek_family <- ggplot(df_report, aes(vek, family_s_total)) +
+  geom_point() +
+  geom_smooth()
+
+plt_family_happiness <- ggplot(df_report, aes(family_s_total, pca_happiness)) +
+  geom_point() +
+  geom_smooth()
+
+plt_vek_family + plt_family_happiness
+```
+
+```{r}
+plt_vek_friends <- ggplot(df_report, aes(vek, friends_s_total)) +
+  geom_point() +
+  geom_smooth()
+
+plt_friends_happiness <- ggplot(df_report, aes(friends_s_total, pca_happiness)) +
+  geom_point() +
+  geom_smooth()
+
+plt_vek_friends + plt_friends_happiness
+```
+
+### Health issues
+```{r plot health}
+plt_vek_health <- ggplot(df_report, aes(vek, health_s_total)) +
+  geom_point() +
+  geom_smooth()
+
+plt_health_happiness <- ggplot(df_report, aes(health_s_total, pca_happiness)) +
+  geom_point() +
+  geom_smooth()
+
+plt_vek_health + plt_health_happiness
+```
+
+```{r lm vek health happiness}
+lm_health_vek <- lm(health_s_total ~ vek, df_report)
+summary(lm_health_vek)
+lm_happiness_vek.health <- lm(pca_happiness ~ vek + health_s_total, df_report)
+summary(lm_happiness_vek.health)
+```
+We have not found any significant difference in self reported health situation across the midlife (). People generally .
+
+### Looking at crisis as a response to death 
+
+# Discussion
+Given our sample, it is possible that the midlife, as it is understood in the popular culture and as it is being marketed to us is happening sooner than 40 years. By 40, people have their goals, meaning and identity sorted out nad no other significant changes and generative processes are taking place. This is in contrast to the 
+
+## Flatness problem
+Surprising results in many fields, including healths ... were that peope in their late 50s did not consider their situation worse than people in their early 40s. Although quite surprising, this could be linked to the relativity of one's self reported information - as these questionnaires could be always considered in relation to peoples surroundings. "Yes, I take pills and my body hurts but I do not have more problems than I should expect for a person my age."
+
+## Cohort problem
+One of the problems with cross sectional studies is that they do not allow for capturing of the individual turmoils which can occur during midlife. If one person goes through the aforementioned crisis in their 40s while others in 45 or 50, it naturally distributes the potential low scores in psychometric measures. In other words, our results do not disprove that people do not suffer from so called midlife crisis, they simply suggest that there is no discrete time point in the midlife which would 
+
+One of the potential reasons for the midlife crisis is the increasing likelihood of significant life altering situatios whcih appear in this time period - people feel health problems and cognitive declie, there are more . While 30s are often filled with marriages, first babies being born, new jobs and opportunities arising, midlife is a time of general stability and life altering situations can be biased towards more negative one - health problems, divorce, menopause, children leaving. But 
+
+
+
+[a]maybe just push it to the popularisation paper :D not everybody knows that film, although they SHOULD

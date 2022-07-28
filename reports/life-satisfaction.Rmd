@@ -18,7 +18,7 @@ library(correlation)
 ```{r loading}
 df_question_categories <- read.table(here("data/processed/question-categories.csv"),
                                      sep=";", header=TRUE)
-df_processed <- load_report_data(language="czech")
+df_processed <- load_report_data(lang="german")
 
 # Takes ls column in a pivoted table
 create_df_ls <- function(df_processed){

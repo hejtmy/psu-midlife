@@ -63,6 +63,9 @@ ggplot(df_report, aes(cesd_s_total)) +
 ```
 
 ```{r visualize all scores together}
+add_3d_plane <- function(){
+  
+}
 lm_happiness <- lm(pwb_s_total ~ 1 + panas_s_hedonic + swls_s_satifaction,
                    data = df_report)
 plane_resolution <- 0.1
@@ -112,8 +115,7 @@ It just creates factors of the individual scales. So it seems they do really rep
 
 ```{r}
 df_happiness_scores <- df_report %>%
-  select(swls_s_satifaction, panas_s_negative, 
-         panas_s_positive, cesd_s_total, starts_with("pwb_s"), -pwb_s_total) %>%
+  select(swls_s_satifaction, panas_s_hedonic, cesd_s_total, pwb_s_total) %>%
   mutate(across(everything(), ~replace_na(.x, median(.x, na.rm = TRUE))))
 
 pca_happiness <- prcomp(df_happiness_scores[complete.cases(df_happiness_scores),],
@@ -128,7 +130,10 @@ biplot(pca_happiness)
 ```
 
 ```{r}
-plot_ly(df_report, x=~swls_s_satifaction, y=~panas_s_hedonic, z =~pwb_s_total, 
+plot_ly(df_report,
+        x=~swls_s_satifaction, 
+        y=~panas_s_hedonic,
+        z=~pwb_s_total, 
         color=pca_happiness$x[,1]) %>%
   add_markers()
 ```
@@ -142,5 +147,20 @@ plot_ly(df_report, x=~swls_s_satifaction, y=~panas_s_hedonic, z =~pwb_s_total,
 ## Total scores factor
 
 ```{r}
-
+fit <- fa(df_happiness_scores[complete.cases(df_happiness_scores),],
+          nfactors=1, rotate="varimax")
+print(fit, digits=2, cutoff=0.3, sort=TRUE)
+loads <- fit$loadings
+fa.diagram(loads)
 ```
+
+### Comparing PCA 1 and FAC 
+```{r}
+ggplot(data.frame(pca_scores = as.vector(pca_happiness$x[,1]), 
+                  factor_scores = as.vector(fit$scores)),
+       aes(pca_scores, factor_scores)) + geom_point()
+
+df_happiness_scores
+```
+
+In the end we will be using the PCA decomposition of `names(df_happiness_scores)`.
